@@ -824,20 +824,12 @@ function updateResult(ev){
     video.style.filter='';
   } else if(running){
     sim.style.display='none';
-    const testing=(manualTM!==null||manualDial!==null);
-    if(testing){
-      // Apply filter directly to video — works on iOS where z-index overlays don't
-      const filters={
-        'very-bright':'brightness(3) saturate(0) contrast(0.5)',
-        'bright':      'brightness(1.8) saturate(0.5)',
-        'good':        'brightness(1.05) saturate(1.1) hue-rotate(10deg)',
-        'dark':        'brightness(0.25) saturate(0.7)',
-        'very-dark':   'brightness(0.05) saturate(0.3)',
-      };
-      video.style.filter=filters[cls]||'';
-    } else {
-      video.style.filter='';
-    }
+    // Brightness filter derived from stops off ideal (EV 11 = centre of "good" zone).
+    // Each stop = ×2 or ÷2 brightness, matching how film actually responds.
+    const targetEV=11;
+    const stopsOff=finalEV-targetEV;
+    const bf=Math.max(0.02,Math.min(8,Math.pow(2,stopsOff)));
+    video.style.filter=`brightness(${bf.toFixed(3)})`;
   }
 
   // Mini polaroid in side panel
