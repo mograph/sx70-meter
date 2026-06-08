@@ -131,25 +131,10 @@ body{
 }
 .pill.near{border-color:var(--z);color:var(--z);background:var(--z2);}
 
-/* ── TM Auto buttons (A100 / A600) ── */
-.tm-autos{display:flex;gap:8px;margin-bottom:10px;}
-.tm-auto-btn{flex:1;padding:16px 10px 12px;border-radius:14px;border:1.5px solid #1e1e1e;
-  background:#0a0a0a;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:all .25s;}
-.tm-auto-btn:active{opacity:.8;}
-.tm-auto-name{font-size:22px;font-weight:900;letter-spacing:2px;color:#333;transition:color .25s,text-shadow .25s;}
-.tm-auto-sub{font-size:9px;color:#2a2a2a;letter-spacing:.5px;margin-top:4px;transition:color .25s;}
-.tm-auto-btn.rec{border-color:var(--z);background:var(--z2);box-shadow:0 0 20px var(--z);}
-.tm-auto-btn.rec .tm-auto-name{color:var(--z);text-shadow:0 0 16px var(--z);}
-.tm-auto-btn.rec .tm-auto-sub{color:var(--z);opacity:.7;}
-.tm-auto-btn.near{border-color:var(--z);background:var(--z2);}
-.tm-auto-btn.near .tm-auto-name,.tm-auto-btn.near .tm-auto-sub{color:var(--z);}
-.tm-auto-btn.manual-sel{border-color:#a78bfa;background:#1a0a2e;box-shadow:0 0 16px #a78bfa;}
-.tm-auto-btn.manual-sel .tm-auto-name,.tm-auto-btn.manual-sel .tm-auto-sub{color:#a78bfa;}
-
-/* ── TM manual speed grid ── */
-.tm-speeds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.tm-speeds .pill{text-align:center;padding:10px 4px;}
+/* ── TM pills — wrapping paragraph style ── */
+.tm-pills{display:flex;flex-wrap:wrap;gap:7px;}
+.tm-pills .pill{flex-shrink:0;}
+.tm-pills .pill.tm-auto{font-size:13px;font-weight:900;letter-spacing:1px;padding:10px 18px;}
 
 /* ── Dial knurled wheel ── */
 .dial-knurl{height:38px;border-radius:10px;overflow:hidden;
@@ -340,19 +325,10 @@ body{
   <div class="scard" id="tmSection">
     <div class="scard-label">MiNT Time Machine Dial</div>
     <div class="scard-sub" id="tmSub">Tap any setting to test it.</div>
-    <!-- Auto mode — big always-visible buttons -->
-    <div class="tm-autos" id="tmAutos">
-      <div class="tm-auto-btn" data-tm="A100" onclick="tapTM('A100')">
-        <div class="tm-auto-name">A100</div>
-        <div class="tm-auto-sub">Auto · SX-70 film</div>
-      </div>
-      <div class="tm-auto-btn" data-tm="A600" onclick="tapTM('A600')">
-        <div class="tm-auto-name">A600</div>
-        <div class="tm-auto-sub">Auto · 600 film</div>
-      </div>
-    </div>
-    <!-- Manual speeds — 4-col grid, all visible -->
-    <div class="tm-speeds" id="tmSpeeds">
+    <!-- All settings as a wrapping paragraph of pills. Tap any to test. -->
+    <div class="tm-pills" id="tmPills">
+      <div class="pill interactive tm-auto" data-tm="A100" onclick="tapTM('A100')">A100</div>
+      <div class="pill interactive tm-auto" data-tm="A600" onclick="tapTM('A600')">A600</div>
       <div class="pill interactive" data-tm="T"    onclick="tapTM('T')">T</div>
       <div class="pill interactive" data-tm="B"    onclick="tapTM('B')">B</div>
       <div class="pill interactive" data-tm="2"    onclick="tapTM('2')">½s</div>
@@ -709,8 +685,9 @@ function updateTM(ev){
   document.getElementById('tmSub').textContent=sub;
   document.getElementById('tmTip').textContent=tip;
 
-  function applyTMClass(p,base){
-    p.className=base;
+  document.querySelectorAll('#tmPills .pill').forEach(p=>{
+    const isBig=p.classList.contains('tm-auto');
+    p.className='pill interactive'+(isBig?' tm-auto':'');
     if(manualTM!==null){
       if(p.dataset.tm===manualTM) p.classList.add('manual-sel');
       else if(p.dataset.tm===rec)  p.classList.add('near');
@@ -721,9 +698,7 @@ function updateTM(ev){
         if(ri>=0&&pi>=0&&Math.abs(pi-ri)===1) p.classList.add('near');
       }
     }
-  }
-  document.querySelectorAll('#tmAutos .tm-auto-btn').forEach(p=>applyTMClass(p,'tm-auto-btn'));
-  document.querySelectorAll('#tmSpeeds .pill').forEach(p=>applyTMClass(p,'pill interactive'));
+  });
 }
 
 // ── Dial ──────────────────────────────────────────────────────────────
