@@ -63,10 +63,26 @@ body{
 .cbadge.s{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#10b981;}
 
 /* Preview screen inside camera */
-.pscreen{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
-.pscreen .pi{font-size:42px;}
-.pscreen .pl{font-size:20px;font-weight:900;letter-spacing:2px;color:var(--z);text-shadow:0 0 20px var(--z);}
-.pscreen .pe{font-size:10px;color:#555;letter-spacing:1px;}
+.pscreen{position:absolute;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;z-index:1;}
+.pscreen .pi{font-size:44px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6));}
+.pscreen .pl{font-size:18px;font-weight:900;letter-spacing:2px;color:#fff;
+  text-shadow:0 1px 12px rgba(0,0,0,.8),0 0 30px var(--z);}
+.pscreen .pe{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1px;}
+
+/* Exposure sim fills the camera box behind the preview content */
+.cam-sim{position:absolute;inset:0;z-index:0;transition:background .5s;display:none;}
+
+/* Grain texture over sim */
+.cam-sim-grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.07;display:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* Verdict badge inside camera frame */
+.cam-verdict{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  z-index:3;display:none;border-radius:20px;padding:5px 16px;
+  font-size:11px;font-weight:800;letter-spacing:1.5px;white-space:nowrap;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.1);color:#fff;}
 
 /* ── Buttons ── */
 .btn-go{display:block;width:100%;max-width:440px;margin:0 auto 7px;padding:15px;
@@ -210,20 +226,12 @@ body{
 .bulb.n{border-color:#131313;background:#0a0a0a;color:#131313;}
 .bcount{text-align:center;font-size:10px;color:#555;margin-bottom:6px;}
 
-/* ── Photo result estimator ── */
+/* ── Photo result info (text only — visual is in the camera frame) ── */
 .result-card{display:none;max-width:440px;margin:0 auto 10px;background:#0c0c0f;
   border:1px solid #161616;border-radius:16px;padding:14px;}
-.result-label{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
-.polaroid-wrap{display:flex;gap:14px;align-items:flex-start;}
-.polaroid-frame{flex-shrink:0;background:#f0ede8;border-radius:4px;padding:7px 7px 22px 7px;
-  box-shadow:0 4px 16px rgba(0,0,0,.5);}
-.polaroid-img{width:90px;height:90px;border-radius:2px;position:relative;overflow:hidden;}
-.polaroid-sim{width:100%;height:100%;transition:background .4s;}
-.polaroid-grain{position:absolute;inset:0;opacity:.06;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-.result-info{flex:1;}
-.result-verdict{font-size:18px;font-weight:900;color:var(--z);transition:color .3s;margin-bottom:4px;}
-.result-desc{font-size:11px;color:#555;line-height:1.6;margin-bottom:8px;}
+.result-label{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.result-verdict{font-size:20px;font-weight:900;color:var(--z);transition:color .3s;margin-bottom:4px;}
+.result-desc{font-size:11px;color:#555;line-height:1.6;margin-bottom:6px;}
 .result-ev-adj{font-size:10px;color:#333;letter-spacing:1px;}
 
 /* dial interactive mode */
@@ -263,6 +271,9 @@ body{
 
 <!-- Camera -->
 <div class="cam" id="cam">
+  <!-- Exposure simulation fill (preview mode) -->
+  <div class="cam-sim" id="camSim"></div>
+  <div class="cam-sim-grain" id="camSimGrain"></div>
   <div class="cam-ph" id="camPh">
     <span class="ei">📷</span>
     <p>Tap Start or try Preview</p>
@@ -275,6 +286,7 @@ body{
     <div class="pe" id="pe">EV 14 · sunny outdoors</div>
   </div>
   <div class="sring" id="sring"></div>
+  <div class="cam-verdict" id="camVerdict"></div>
   <div class="cbadge" id="cbadge"></div>
 </div>
 <canvas id="canvas"></canvas>
@@ -294,22 +306,12 @@ body{
   <div class="zhint" id="zhint">Point camera at your subject</div>
 </div>
 
-<!-- Photo result estimator -->
+<!-- Photo result info -->
 <div class="result-card" id="resultCard">
   <div class="result-label">Estimated Photo Result</div>
-  <div class="polaroid-wrap">
-    <div class="polaroid-frame">
-      <div class="polaroid-img">
-        <div class="polaroid-sim" id="polSim"></div>
-        <div class="polaroid-grain"></div>
-      </div>
-    </div>
-    <div class="result-info">
-      <div class="result-verdict" id="resultVerdict">--</div>
-      <div class="result-desc"   id="resultDesc">--</div>
-      <div class="result-ev-adj" id="resultEVAdj"></div>
-    </div>
-  </div>
+  <div class="result-verdict" id="resultVerdict">--</div>
+  <div class="result-desc"   id="resultDesc">--</div>
+  <div class="result-ev-adj" id="resultEVAdj"></div>
 </div>
 
 <!-- EV bar -->
@@ -528,6 +530,9 @@ function startPreview(){
   document.getElementById('pscreen').style.display='flex';
   document.getElementById('sring').style.display='block';
   document.getElementById('spick').style.display='block';
+  document.getElementById('camSim').style.display='block';
+  document.getElementById('camSimGrain').style.display='block';
+  document.getElementById('camVerdict').style.display='block';
   const cb=document.getElementById('cbadge');
   cb.className='cbadge p'; cb.textContent='PREVIEW MODE'; cb.style.display='block';
   showPanels(); buildScenes(); buildBulbs(); pickScene(0);
@@ -784,7 +789,13 @@ function updateResult(ev){
   }
 
   setZC(cls);
-  document.getElementById('polSim').style.background=bg;
+
+  // Drive the camera-frame exposure simulation
+  document.getElementById('camSim').style.background=bg;
+  document.getElementById('camVerdict').textContent=verdict;
+  document.getElementById('camVerdict').style.color=
+    (finalEV>=10&&finalEV<=13)?'#000':'#fff';
+
   document.getElementById('resultVerdict').textContent=verdict;
   document.getElementById('resultDesc').textContent=desc;
   const filmPart=filmOff?` + film (${filmOff>0?'+':''}${filmOff})`:'';
