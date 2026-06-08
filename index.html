@@ -789,23 +789,23 @@ function updateResult(ev){
   if(finalEV>15){
     verdict='Blown Out'; cls='very-bright';
     desc='Will be completely white and washed out. Push dial toward Dark.';
-    bg='linear-gradient(135deg,#fff 0%,#f0ede8 60%,#e8e4df 100%)';
+    bg='#ffffff';
   } else if(finalEV>13){
     verdict='Too Bright'; cls='bright';
     desc='Highlights will bleach. Slightly overexposed for Polaroid film.';
-    bg='linear-gradient(135deg,#e0ddd8,#ccc9c2)';
+    bg='linear-gradient(135deg,#fffaf0,#f5e6c8)';
   } else if(finalEV>=10){
     verdict='Looks Good!'; cls='good';
     desc='Well exposed. Colours and shadows should come out naturally.';
-    bg='linear-gradient(135deg,#7c8a6e,#4a6040,#2a3d24)';
+    bg='rgba(80,120,70,0.6)';
   } else if(finalEV>=7){
     verdict='Slightly Dark'; cls='dark';
     desc='A bit underexposed. Shadows will be dense. Try lightening the dial one step.';
-    bg='linear-gradient(135deg,#2a2a2a,#1a1a1a)';
+    bg='linear-gradient(135deg,#1a1a2e,#0a0a18)';
   } else {
     verdict='Too Dark'; cls='very-dark';
     desc='Will come out nearly black. Need Max Lighten + flash.';
-    bg='linear-gradient(135deg,#111,#050505)';
+    bg='#000000';
   }
 
   setZC(cls);
@@ -820,8 +820,10 @@ function updateResult(ev){
     sim.style.zIndex='0';
     sim.style.display='block';
   } else if(running){
-    // Camera: translucent tint over the live video (z-index above video)
-    sim.style.opacity='0.22';
+    // Camera: visible tint over the live video so you can actually see the effect
+    // More dramatic when actively testing a non-default setting
+    const testing=(manualTM!==null||manualDial!==null);
+    sim.style.opacity=testing?'1':'0.35';
     sim.style.zIndex='2';
     sim.style.display='block';
   }
