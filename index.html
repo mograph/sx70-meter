@@ -88,6 +88,14 @@ body{
   background:rgba(0,0,0,.55);backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.1);color:#fff;transition:color .3s;}
 
+/* Camera HUD bottom panel */
+.cam-hud{position:absolute;bottom:0;left:0;right:0;z-index:6;display:none;
+  padding:6px 10px;
+  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.6) 60%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between;}
+.hud-zone{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--z);text-transform:uppercase;}
+.hud-ev{font-size:10px;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums;}
+
 /* Side info panel */
 .side-info{width:145px;flex-shrink:0;display:none;flex-direction:column;
   justify-content:space-between;
@@ -307,6 +315,10 @@ body{
     <div class="sring" id="sring"></div>
     <div class="cam-verdict" id="camVerdict"></div>
     <div class="cbadge" id="cbadge"></div>
+    <div class="cam-hud" id="camHud">
+      <span class="hud-zone" id="hudZone">--</span>
+      <span class="hud-ev" id="hudEV">--</span>
+    </div>
   </div>
 
   <!-- Side info panel -->
@@ -828,7 +840,8 @@ function updateResult(ev){
     // Each stop = ×2 or ÷2 brightness, matching how film actually responds.
     const targetEV=11;
     const stopsOff=finalEV-targetEV;
-    const bf=Math.max(0.02,Math.min(8,Math.pow(2,stopsOff)));
+    // Amplify by 1.8× so each stop feels much more obvious on screen
+    const bf=Math.max(0.01,Math.min(12,Math.pow(2,stopsOff*1.8)));
     video.style.filter=`brightness(${bf.toFixed(3)})`;
   }
 
@@ -849,6 +862,17 @@ function updateResult(ev){
   const tmPart=tmOff?` + TM (${tmOff>0?'+':''}${tmOff.toFixed(1)})`:'';
   document.getElementById('resultEVAdj').textContent=
     `Scene ${ev.toFixed(1)}${filmPart}${dialPart}${tmPart} = ${finalEV.toFixed(1)} EV`;
+
+  // Camera HUD panel
+  const hud=document.getElementById('camHud');
+  if(running||pvMode){
+    hud.style.display='flex';
+    document.getElementById('hudZone').textContent=verdict;
+    const stopsLabel=(finalEV-11)>=0?`+${(finalEV-11).toFixed(1)}`:(finalEV-11).toFixed(1);
+    document.getElementById('hudEV').textContent=`${finalEV.toFixed(1)} EV (${stopsLabel} stops)`;
+  } else {
+    hud.style.display='none';
+  }
 
   // Keep legacy hidden element in sync so nothing throws
   document.getElementById('resultDesc').textContent=desc;
