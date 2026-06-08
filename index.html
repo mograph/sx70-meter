@@ -708,13 +708,22 @@ function updateTM(ev){
   let rec,sub,tip;
 
   if(is600){
-    if(eff<5)      {rec='T';  tip='Very dark — use T (time exposure). Put camera on a stable surface. Press shutter once to open, again to close. Needs flash too.';}
-    else if(eff<7) {rec='2';  tip='Dark scene — try 1/2 sec shutter. Keep camera very steady or use a surface.';}
-    else if(eff<9) {rec='8';  tip='Dim scene — 1/8 sec. Hold camera steady against something solid.';}
+    if(eff<5)      {rec='T';   tip='Very dark — use T (time exposure). Put camera on a stable surface. Press shutter once to open, again to close. Needs flash too.';}
+    else if(eff<7) {rec='2';   tip='Dark scene — try 1/2 sec shutter. Keep camera very steady or use a surface.';}
+    else if(eff<9) {rec='8';   tip='Dim scene — 1/8 sec. Hold camera steady against something solid.';}
     else if(eff<11){rec='A600';tip='Good for 600 film — A600 is the right auto mode. Camera handles the rest.';}
     else if(eff<14){rec='A600';tip='Good light — A600 auto mode is perfect here. The camera exposes correctly for your 600/i-Type film.';}
     else           {rec='A600';tip='Bright scene — A600 auto mode. If shots are still too bright, push the lighten/darken dial toward Dark.';}
     sub='600 film detected — A600 is your main auto mode.';
+  } else if(usingFlash){
+    // SLR670-X with flash: camera handles metering, A100 not needed.
+    // Recommend a manual shutter to balance ambient vs flash.
+    if(eff<5)      {rec='2';   tip='Very dark — flash is primary. Use ½s to let some ambient fill in. Camera steady on a surface.';}
+    else if(eff<8) {rec='30';  tip='Dark scene — flash as main light. 1/30 balances flash with ambient. Hold steady.';}
+    else if(eff<11){rec='60';  tip='Dim to indoor — 1/60 is a clean flash sync speed. Flash fills shadows, ambient sets mood.';}
+    else if(eff<14){rec='125'; tip='Good light — 1/125 keeps ambient controlled so flash pops the subject.';}
+    else           {rec='500'; tip='Bright — fast shutter limits ambient. Flash only useful very close.';}
+    sub='Flash mode — A100 not needed, SLR670-X meters with flash.';
   } else {
     if(eff<5)      {rec='T';   tip='Very dark — use T (time exposure). Camera on a surface. Press shutter once to open, again to close. Use flash if possible.';}
     else if(eff<7) {rec='2';   tip='Dark scene — 1/2 sec shutter. Keep camera very still.';}
