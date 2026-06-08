@@ -815,17 +815,26 @@ function updateResult(ev){
   sim.style.background=bg;
 
   if(pvMode){
-    // Preview: full-opacity sim fills the frame (behind pscreen content)
     sim.style.opacity='1';
     sim.style.zIndex='0';
     sim.style.display='block';
+    video.style.filter='';
   } else if(running){
-    // Camera: visible tint over the live video so you can actually see the effect
-    // More dramatic when actively testing a non-default setting
+    sim.style.display='none';
     const testing=(manualTM!==null||manualDial!==null);
-    sim.style.opacity=testing?'1':'0.35';
-    sim.style.zIndex='2';
-    sim.style.display='block';
+    if(testing){
+      // Apply filter directly to video — works on iOS where z-index overlays don't
+      const filters={
+        'very-bright':'brightness(2.5) saturate(0.3) contrast(0.6)',
+        'bright':      'brightness(1.7) saturate(0.6)',
+        'good':        'brightness(1.0) saturate(1.0)',
+        'dark':        'brightness(0.35) saturate(0.8)',
+        'very-dark':   'brightness(0.08) saturate(0.5)',
+      };
+      video.style.filter=filters[cls]||'';
+    } else {
+      video.style.filter='';
+    }
   }
 
   // Mini polaroid in side panel
