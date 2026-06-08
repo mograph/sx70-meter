@@ -11,7 +11,7 @@ html{overflow-y:scroll;-webkit-overflow-scrolling:touch;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   background:#07070a; color:#fff;
-  padding:14px 14px 80px;
+  padding:14px 14px max(80px, calc(60px + env(safe-area-inset-bottom)));
   min-height:100vh;
   overflow-x:hidden;
 }
@@ -131,17 +131,43 @@ body{
 }
 .pill.near{border-color:var(--z);color:var(--z);background:var(--z2);}
 
-/* Time Machine pills — scrollable single row */
-.tm-pills{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;padding-bottom:4px;}
-.tm-pills::-webkit-scrollbar{display:none;}
-.tm-pills .pill{flex-shrink:0;}
-.tm-div{background:transparent!important;border-color:transparent!important;
-  color:#333!important;padding:9px 2px!important;cursor:default;
-  box-shadow:none!important;transform:none!important;}
+/* ── TM Auto buttons (A100 / A600) ── */
+.tm-autos{display:flex;gap:8px;margin-bottom:10px;}
+.tm-auto-btn{flex:1;padding:16px 10px 12px;border-radius:14px;border:1.5px solid #1e1e1e;
+  background:#0a0a0a;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .25s;}
+.tm-auto-btn:active{opacity:.8;}
+.tm-auto-name{font-size:22px;font-weight:900;letter-spacing:2px;color:#333;transition:color .25s,text-shadow .25s;}
+.tm-auto-sub{font-size:9px;color:#2a2a2a;letter-spacing:.5px;margin-top:4px;transition:color .25s;}
+.tm-auto-btn.rec{border-color:var(--z);background:var(--z2);box-shadow:0 0 20px var(--z);}
+.tm-auto-btn.rec .tm-auto-name{color:var(--z);text-shadow:0 0 16px var(--z);}
+.tm-auto-btn.rec .tm-auto-sub{color:var(--z);opacity:.7;}
+.tm-auto-btn.near{border-color:var(--z);background:var(--z2);}
+.tm-auto-btn.near .tm-auto-name,.tm-auto-btn.near .tm-auto-sub{color:var(--z);}
+.tm-auto-btn.manual-sel{border-color:#a78bfa;background:#1a0a2e;box-shadow:0 0 16px #a78bfa;}
+.tm-auto-btn.manual-sel .tm-auto-name,.tm-auto-btn.manual-sel .tm-auto-sub{color:#a78bfa;}
 
-/* ── Dial segments (replaces knob track) ── */
-.dial-seg-row{display:flex;width:100%;margin:10px 0 6px;border-radius:14px;overflow:hidden;border:1.5px solid #1a1a1a;}
+/* ── TM manual speed grid ── */
+.tm-speeds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.tm-speeds .pill{text-align:center;padding:10px 4px;}
+
+/* ── Dial knurled wheel ── */
+.dial-knurl{height:38px;border-radius:10px;overflow:hidden;
+  background:repeating-linear-gradient(
+    90deg,
+    #0e0e0e 0px,#0e0e0e 2px,
+    #1c1c1c 2px,#1c1c1c 4px,
+    #141414 4px,#141414 7px,
+    #0a0a0a 7px,#0a0a0a 10px
+  );
+  border:1.5px solid #2a2a2a;
+  position:relative;margin-bottom:8px;}
+.dial-knurl-pos{position:absolute;top:0;bottom:0;width:5px;
+  background:var(--z);box-shadow:0 0 14px var(--z),0 0 28px var(--z);
+  transform:translateX(-50%);transition:left .35s ease,background .3s,box-shadow .3s;}
+
+/* ── Dial segments ── */
+.dial-seg-row{display:flex;width:100%;margin:0 0 6px;border-radius:14px;overflow:hidden;border:1.5px solid #1a1a1a;}
 .dial-seg{flex:1;padding:12px 4px 8px;text-align:center;cursor:pointer;
   border-right:1px solid #1a1a1a;background:#0a0a0a;
   -webkit-tap-highlight-color:transparent;transition:all .2s;
@@ -311,16 +337,24 @@ body{
 <div class="settings" id="settings">
 
   <!-- 1. MiNT Time Machine -->
-  <div class="scard">
+  <div class="scard" id="tmSection">
     <div class="scard-label">MiNT Time Machine Dial</div>
-    <div class="scard-sub" id="tmSub">Set the dial on top of your camera to the highlighted setting.</div>
-    <!-- Auto modes first, then manual speeds. Tap any pill to test it. -->
-    <div class="tm-pills" id="tmPills">
-      <div class="pill interactive" data-tm="A100" onclick="tapTM('A100')">A100</div>
-      <div class="pill interactive" data-tm="A600" onclick="tapTM('A600')">A600</div>
-      <div class="pill tm-div">·</div>
-      <div class="pill interactive" data-tm="T" onclick="tapTM('T')">T</div>
-      <div class="pill interactive" data-tm="B" onclick="tapTM('B')">B</div>
+    <div class="scard-sub" id="tmSub">Tap any setting to test it.</div>
+    <!-- Auto mode — big always-visible buttons -->
+    <div class="tm-autos" id="tmAutos">
+      <div class="tm-auto-btn" data-tm="A100" onclick="tapTM('A100')">
+        <div class="tm-auto-name">A100</div>
+        <div class="tm-auto-sub">Auto · SX-70 film</div>
+      </div>
+      <div class="tm-auto-btn" data-tm="A600" onclick="tapTM('A600')">
+        <div class="tm-auto-name">A600</div>
+        <div class="tm-auto-sub">Auto · 600 film</div>
+      </div>
+    </div>
+    <!-- Manual speeds — 4-col grid, all visible -->
+    <div class="tm-speeds" id="tmSpeeds">
+      <div class="pill interactive" data-tm="T"    onclick="tapTM('T')">T</div>
+      <div class="pill interactive" data-tm="B"    onclick="tapTM('B')">B</div>
       <div class="pill interactive" data-tm="2"    onclick="tapTM('2')">½s</div>
       <div class="pill interactive" data-tm="4"    onclick="tapTM('4')">¼s</div>
       <div class="pill interactive" data-tm="8"    onclick="tapTM('8')">1/8</div>
@@ -339,6 +373,10 @@ body{
   <div class="scard">
     <div class="scard-label">SX-70 Lighten / Darken Dial</div>
     <div class="fwarn" id="fwarn">⚠ 600 film overexposes 2 stops in SX-70 — always push dial toward Dark.</div>
+    <!-- Knurled wheel visual — cursor shows recommended/testing position -->
+    <div class="dial-knurl">
+      <div class="dial-knurl-pos" id="dialKnurlPos" style="left:50%"></div>
+    </div>
     <!-- 5-segment dial — tap any segment to test. Green = recommended, purple = testing. -->
     <div class="dial-seg-row" id="dialSegs">
       <div class="dial-seg" data-d="0" onclick="tapDial(0)">
@@ -660,46 +698,32 @@ function updateTM(ev){
     sub='SX-70 film detected — A100 is your main auto mode.';
   }
 
-  // Override tip/sub when user is testing a specific setting
+  // Override tip when testing a non-recommended setting
   if(manualTM!==null&&manualTM!==rec){
     const lbl={'T':'Time (T)','B':'Bulb (B)','A100':'A100 Auto','A600':'A600 Auto',
       '2':'½s','4':'¼s','8':'1/8s','15':'1/15s','30':'1/30s','60':'1/60s',
       '125':'1/125s','250':'1/250s','500':'1/500s','1000':'1/1000s'}[manualTM]||manualTM;
-    tip=`Testing ${lbl} — tap it again to return to recommended (${rec}). Check estimated result above.`;
-  } else if(manualTM===rec){
-    tip+=' ✓ You are on the recommended setting.';
+    tip=`Testing ${lbl} — tap again to clear. Recommended: ${rec}.`;
   }
 
-  document.getElementById('tmSub').textContent=sub+(manualTM===null?' Tap any to test.':'');
+  document.getElementById('tmSub').textContent=sub;
   document.getElementById('tmTip').textContent=tip;
 
-  // Only touch pills that have a data-tm (skip the divider element)
-  document.querySelectorAll('#tmPills .pill[data-tm]').forEach(p=>{
-    p.className='pill interactive';
+  function applyTMClass(p,base){
+    p.className=base;
     if(manualTM!==null){
-      // Testing mode: purple for testing, dim green for recommended
       if(p.dataset.tm===manualTM) p.classList.add('manual-sel');
-      else if(p.dataset.tm===rec) p.classList.add('near');
+      else if(p.dataset.tm===rec)  p.classList.add('near');
     } else {
-      // Auto mode: green for recommended, dim for adjacent
       if(p.dataset.tm===rec) p.classList.add('rec');
       else{
-        const ri=TM_ORDER.indexOf(rec), pi=TM_ORDER.indexOf(p.dataset.tm);
+        const ri=TM_ORDER.indexOf(rec),pi=TM_ORDER.indexOf(p.dataset.tm);
         if(ri>=0&&pi>=0&&Math.abs(pi-ri)===1) p.classList.add('near');
       }
     }
-  });
-
-  // Scroll to active pill (testing or recommended)
-  requestAnimationFrame(()=>{
-    const active=document.querySelector('#tmPills .pill.manual-sel')||
-                 document.querySelector('#tmPills .pill.rec');
-    const strip=document.getElementById('tmPills');
-    if(active&&strip){
-      const target=active.offsetLeft-(strip.offsetWidth/2)+(active.offsetWidth/2);
-      strip.scrollTo({left:Math.max(0,target),behavior:'smooth'});
-    }
-  });
+  }
+  document.querySelectorAll('#tmAutos .tm-auto-btn').forEach(p=>applyTMClass(p,'tm-auto-btn'));
+  document.querySelectorAll('#tmSpeeds .pill').forEach(p=>applyTMClass(p,'pill interactive'));
 }
 
 // ── Dial ──────────────────────────────────────────────────────────────
@@ -723,6 +747,10 @@ function tapTM(val){
 
 function updateDial(ev){
   const auto=autoDialPos(ev);
+  const active=manualDial!==null?manualDial:auto;
+
+  // Move knurl cursor to active position (0%=dark … 100%=light)
+  document.getElementById('dialKnurlPos').style.left=(active*25)+'%';
 
   document.querySelectorAll('#dialSegs .dial-seg').forEach(p=>{
     const d=parseInt(p.dataset.d);
