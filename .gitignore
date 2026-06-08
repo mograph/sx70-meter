@@ -1,0 +1,5 @@
+# SSL certs — local only, do not commit
+cert.pem
+key.pem
+*.pem
+*.key

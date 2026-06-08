@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SX-70 Meter</title>
+<style>
+:root { --z:#10b981; --z2:#022c22; --zd:#065f46; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{overflow-y:scroll;-webkit-overflow-scrolling:touch;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#07070a; color:#fff;
+  padding:14px 14px 80px;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;max-width:440px;margin:0 auto 10px;}
+.logo{font-size:13px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+  background:linear-gradient(90deg,#f472b6,#a78bfa,#38bdf8,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dbadge{font-size:9px;color:#444;background:#0f0f0f;border:1px solid #1e1e1e;border-radius:20px;padding:3px 8px;letter-spacing:1px;}
+.dbadge b{color:#666;}
+
+/* ── Film chips ── */
+.film-row{display:flex;gap:6px;max-width:440px;margin:0 auto 10px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.film-row::-webkit-scrollbar{display:none;}
+.fc{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid #1e1e1e;
+  font-size:10px;font-weight:700;color:#333;cursor:pointer;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;transition:all .15s;}
+.fc[data-f="sx70-c"].on{border-color:#34d399;background:#022c22;color:#34d399;}
+.fc[data-f="sx70-b"].on{border-color:#94a3b8;background:#0f172a;color:#94a3b8;}
+.fc[data-f="600-c"].on {border-color:#fb923c;background:#1c0a00;color:#fb923c;}
+.fc[data-f="600-b"].on {border-color:#a78bfa;background:#1a0a2e;color:#a78bfa;}
+
+/* ── Camera ── */
+.cam{position:relative;width:100%;max-width:440px;margin:0 auto 10px;
+  border-radius:18px;overflow:hidden;background:#0c0c0f;
+  aspect-ratio:4/3;max-height:280px;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid #1a1a1a;transition:border-color .3s;}
+.cam.lit{border-color:var(--z);}
+#video{width:100%;height:100%;object-fit:cover;display:none;}
+#canvas{display:none;}
+.cam-ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:#2a2a2a;}
+.cam-ph .ei{font-size:38px;}
+.cam-ph p{font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+.cam-ph small{font-size:10px;color:#333;text-align:center;line-height:1.5;max-width:260px;}
+.sring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:48px;height:48px;border-radius:50%;border:1.5px solid var(--z);
+  pointer-events:none;display:none;box-shadow:0 0 14px var(--z);transition:all .3s;}
+.sring::before,.sring::after{content:'';position:absolute;background:var(--z);transition:background .3s;}
+.sring::before{width:1px;height:7px;top:-11px;left:50%;transform:translateX(-50%);}
+.sring::after{width:7px;height:1px;left:-11px;top:50%;transform:translateY(-50%);}
+.cbadge{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  border-radius:20px;padding:4px 12px;font-size:9px;letter-spacing:1px;
+  white-space:nowrap;border:1px solid transparent;display:none;}
+.cbadge.p{background:rgba(99,102,241,.85);color:#fff;}
+.cbadge.px{background:rgba(0,0,0,.65);border-color:#222;color:#555;backdrop-filter:blur(8px);}
+.cbadge.s{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#10b981;}
+
+/* Preview screen inside camera */
+.pscreen{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.pscreen .pi{font-size:42px;}
+.pscreen .pl{font-size:20px;font-weight:900;letter-spacing:2px;color:var(--z);text-shadow:0 0 20px var(--z);}
+.pscreen .pe{font-size:10px;color:#555;letter-spacing:1px;}
+
+/* ── Buttons ── */
+.btn-go{display:block;width:100%;max-width:440px;margin:0 auto 7px;padding:15px;
+  background:linear-gradient(135deg,#6366f1,#ec4899);color:#fff;border:none;
+  border-radius:16px;font-size:14px;font-weight:800;cursor:pointer;
+  letter-spacing:2px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 24px rgba(99,102,241,.35);}
+.btn-go:active{opacity:.85;}
+.btn-sec{display:block;width:100%;max-width:440px;margin:0 auto 14px;padding:11px;
+  background:transparent;color:#444;border:1.5px solid #1e1e1e;border-radius:14px;
+  font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  text-transform:uppercase;-webkit-tap-highlight-color:transparent;}
+
+/* ── Scene picker ── */
+.spick{display:none;max-width:440px;margin:0 auto 12px;background:#0c0c0f;
+  border:1px solid #1e1e1e;border-radius:14px;padding:12px;}
+.spick-t{font-size:9px;color:#444;letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.sb{padding:10px 4px;border-radius:10px;border:1.5px solid #1e1e1e;text-align:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.sb .si{font-size:18px;display:block;margin-bottom:3px;}
+.sb .sn{font-size:9px;font-weight:700;color:#555;}
+.sb .se{font-size:8px;color:#333;margin-top:1px;}
+.sb.on{border-color:var(--z);background:var(--z2);}
+.sb.on .sn{color:var(--z);}
+.sb.on .se{color:var(--z);opacity:.7;}
+
+/* ── Zone bar ── */
+.zbar{display:none;max-width:440px;margin:0 auto 10px;border-radius:14px;
+  padding:13px 16px;text-align:center;border:1.5px solid var(--z);background:var(--z2);
+  transition:border-color .3s,background .3s;}
+.zname{font-size:22px;font-weight:900;letter-spacing:3px;color:var(--z);transition:color .3s;}
+.zhint{font-size:11px;color:var(--zd);margin-top:3px;transition:color .3s;}
+
+/* Thin EV bar */
+.ebar{display:none;max-width:440px;margin:0 auto 14px;}
+.ebar-labels{display:flex;justify-content:space-between;font-size:8px;color:#2a2a2a;letter-spacing:1px;margin-bottom:5px;text-transform:uppercase;}
+.ebar-track{height:8px;border-radius:4px;
+  background:linear-gradient(to right,#312e81 0%,#4f46e5 15%,#3b82f6 28%,#10b981 44%,#a3e635 56%,#f59e0b 70%,#ef4444 85%,#991b1b 100%);
+  position:relative;}
+.needle{position:absolute;top:-6px;width:3px;height:20px;background:#fff;border-radius:2px;
+  transform:translateX(-50%);transition:left .25s ease;box-shadow:0 0 8px rgba(255,255,255,.9);}
+
+/* ══ SETTINGS ══ */
+.settings{display:none;max-width:440px;margin:0 auto;}
+
+/* Section card */
+.scard{background:#0c0c0f;border:1px solid #161616;border-radius:16px;padding:14px;margin-bottom:10px;}
+.scard-label{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.scard-sub{font-size:10px;color:#333;margin-bottom:10px;line-height:1.5;}
+
+/* ── Pills ── */
+.pills{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{
+  padding:9px 14px;border-radius:30px;border:1.5px solid #1e1e1e;background:#0a0a0a;
+  font-size:11px;font-weight:700;color:#333;cursor:default;
+  transition:all .25s;white-space:nowrap;letter-spacing:.5px;
+}
+.pill.rec{
+  border-color:var(--z);background:var(--z);color:#000;
+  box-shadow:0 0 18px var(--z);font-size:12px;transform:scale(1.08);
+}
+.pill.near{border-color:var(--z);color:var(--z);background:var(--z2);}
+
+/* Time Machine pills — scrollable single row */
+.tm-pills{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding-bottom:4px;}
+.tm-pills::-webkit-scrollbar{display:none;}
+.tm-pills .pill{flex-shrink:0;}
+.tm-div{background:transparent!important;border-color:transparent!important;
+  color:#333!important;padding:9px 2px!important;cursor:default;
+  box-shadow:none!important;transform:none!important;}
+
+/* ── Dial segments (replaces knob track) ── */
+.dial-seg-row{display:flex;width:100%;margin:10px 0 6px;border-radius:14px;overflow:hidden;border:1.5px solid #1a1a1a;}
+.dial-seg{flex:1;padding:12px 4px 8px;text-align:center;cursor:pointer;
+  border-right:1px solid #1a1a1a;background:#0a0a0a;
+  -webkit-tap-highlight-color:transparent;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:4px;}
+.dial-seg:last-child{border-right:none;}
+.dial-seg .ds-icon{font-size:14px;line-height:1;}
+.dial-seg .ds-lbl{font-size:8px;font-weight:700;color:#333;letter-spacing:.4px;white-space:nowrap;}
+.dial-seg.rec{background:var(--z);border-color:var(--z);}
+.dial-seg.rec .ds-icon,.dial-seg.rec .ds-lbl{color:#000;}
+.dial-seg.near{background:var(--z2);border-color:var(--z);}
+.dial-seg.near .ds-lbl{color:var(--z);}
+.dial-seg.manual-sel{background:#1a0a2e;border-color:#a78bfa;}
+.dial-seg.manual-sel .ds-icon,.dial-seg.manual-sel .ds-lbl{color:#a78bfa;}
+
+/* ── Toggle rows ── */
+.togrow{display:flex;justify-content:space-between;align-items:center;
+  padding:13px 14px;border-radius:14px;background:#0c0c0f;
+  border:1px solid #161616;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.togrow-l{font-size:13px;font-weight:700;color:#888;}
+.togrow-s{font-size:9px;color:#333;margin-top:2px;letter-spacing:.5px;}
+.tog{width:44px;height:24px;background:#1a1a1a;border-radius:12px;
+  position:relative;flex-shrink:0;transition:background .2s;}
+.tog.on{background:var(--z);}
+.tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;
+  background:#fff;top:2px;left:2px;transition:left .2s;}
+.tog.on::after{left:22px;}
+
+/* Flash type tabs */
+.ftabs{display:flex;gap:6px;margin-bottom:8px;}
+.ftab{flex:1;padding:10px 6px;border-radius:12px;border:1.5px solid #1a1a1a;
+  font-size:11px;font-weight:700;color:#333;text-align:center;cursor:pointer;
+  background:transparent;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.ftab .fs{display:block;font-size:8px;font-weight:400;color:#2a2a2a;margin-top:2px;}
+.ftab.on{border-color:var(--z);background:var(--z2);color:var(--z);}
+.ftab.on .fs{color:var(--z);opacity:.6;}
+
+/* dist note */
+.dist-note{margin-top:10px;padding:8px 11px;background:#080808;border-radius:8px;border-left:2px solid var(--z);transition:border-color .3s;}
+.dn-label{font-size:9px;color:#444;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.dn-value{font-size:18px;font-weight:900;color:var(--z);transition:color .3s;}
+.tip{margin-top:8px;font-size:10px;color:#555;line-height:1.7;padding:8px 10px;
+  background:#080808;border-radius:8px;border-left:2px solid var(--z);transition:border-color .3s;}
+
+/* 600 warn */
+.fwarn{display:none;font-size:10px;color:#fb923c;line-height:1.6;padding:8px 10px;
+  background:rgba(251,146,60,.07);border-radius:8px;border:1px solid rgba(251,146,60,.18);margin-bottom:10px;}
+.fwarn.on{display:block;}
+
+/* FlashBar bulbs */
+.bulb-grid{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0;}
+.bulb{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9px;font-weight:800;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:all .15s;border:1.5px solid #1e1e1e;color:#1e1e1e;}
+.bulb.y{border-color:var(--z);background:var(--z2);color:var(--z);}
+.bulb.n{border-color:#131313;background:#0a0a0a;color:#131313;}
+.bcount{text-align:center;font-size:10px;color:#555;margin-bottom:6px;}
+
+/* ── Photo result estimator ── */
+.result-card{display:none;max-width:440px;margin:0 auto 10px;background:#0c0c0f;
+  border:1px solid #161616;border-radius:16px;padding:14px;}
+.result-label{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.polaroid-wrap{display:flex;gap:14px;align-items:flex-start;}
+.polaroid-frame{flex-shrink:0;background:#f0ede8;border-radius:4px;padding:7px 7px 22px 7px;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.polaroid-img{width:90px;height:90px;border-radius:2px;position:relative;overflow:hidden;}
+.polaroid-sim{width:100%;height:100%;transition:background .4s;}
+.polaroid-grain{position:absolute;inset:0;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.result-info{flex:1;}
+.result-verdict{font-size:18px;font-weight:900;color:var(--z);transition:color .3s;margin-bottom:4px;}
+.result-desc{font-size:11px;color:#555;line-height:1.6;margin-bottom:8px;}
+.result-ev-adj{font-size:10px;color:#333;letter-spacing:1px;}
+
+/* dial interactive mode */
+.dial-interactive-note{font-size:9px;color:#555;letter-spacing:1px;
+  text-align:center;margin-top:8px;font-style:italic;}
+.pill.interactive{cursor:pointer;}
+.pill.interactive:active{opacity:.75;}
+.pill.manual-sel{border-color:#a78bfa;background:#1a0a2e;color:#a78bfa;transform:scale(1.05);}
+
+/* Advanced */
+.adv-toggle{max-width:440px;margin:0 auto 8px;text-align:center;font-size:10px;
+  color:#333;letter-spacing:1px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.adv-panel{display:none;max-width:440px;margin:0 auto 10px;background:#0c0c0f;
+  border:1px solid #161616;border-radius:14px;padding:12px;}
+.adv-ev{text-align:center;font-size:34px;font-weight:900;color:var(--z);
+  margin-bottom:6px;font-variant-numeric:tabular-nums;}
+.adv-src{text-align:center;font-size:9px;color:#333;letter-spacing:1px;margin-bottom:8px;}
+#histCanvas{width:100%;height:40px;border-radius:6px;display:block;}
+.hilab{display:flex;justify-content:space-between;font-size:8px;color:#1e1e1e;margin-top:3px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="logo">SX-70 Meter</div>
+  <div class="dbadge" id="dbadge">detecting…</div>
+</div>
+
+<!-- Film selector -->
+<div class="film-row">
+  <div class="fc on" data-f="sx70-c" onclick="setFilm(this)">SX-70 Color · ISO 160</div>
+  <div class="fc"    data-f="sx70-b" onclick="setFilm(this)">SX-70 B&amp;W · ISO 160</div>
+  <div class="fc"    data-f="600-c"  onclick="setFilm(this)">600 Color · ISO 640</div>
+  <div class="fc"    data-f="600-b"  onclick="setFilm(this)">600 B&amp;W · ISO 640</div>
+</div>
+
+<!-- Camera -->
+<div class="cam" id="cam">
+  <div class="cam-ph" id="camPh">
+    <span class="ei">📷</span>
+    <p>Tap Start or try Preview</p>
+    <small id="httpsNote" style="display:none">⚠ Camera requires HTTPS.<br>Use the <b>https://</b> URL from your Mac terminal.</small>
+  </div>
+  <video id="video" autoplay playsinline muted></video>
+  <div class="pscreen" id="pscreen">
+    <div class="pi" id="pi">☀️</div>
+    <div class="pl" id="pl">BRIGHT DAY</div>
+    <div class="pe" id="pe">EV 14 · sunny outdoors</div>
+  </div>
+  <div class="sring" id="sring"></div>
+  <div class="cbadge" id="cbadge"></div>
+</div>
+<canvas id="canvas"></canvas>
+
+<button class="btn-go"  id="startBtn"  onclick="startCamera()">Start Light Meter</button>
+<button class="btn-sec" id="prevBtn"   onclick="startPreview()">Try Preview Mode (no camera needed)</button>
+
+<!-- Scene picker -->
+<div class="spick" id="spick">
+  <div class="spick-t">Simulate a lighting scene</div>
+  <div class="sgrid" id="sgrid"></div>
+</div>
+
+<!-- Zone status -->
+<div class="zbar" id="zbar">
+  <div class="zname" id="zname">--</div>
+  <div class="zhint" id="zhint">Point camera at your subject</div>
+</div>
+
+<!-- Photo result estimator -->
+<div class="result-card" id="resultCard">
+  <div class="result-label">Estimated Photo Result</div>
+  <div class="polaroid-wrap">
+    <div class="polaroid-frame">
+      <div class="polaroid-img">
+        <div class="polaroid-sim" id="polSim"></div>
+        <div class="polaroid-grain"></div>
+      </div>
+    </div>
+    <div class="result-info">
+      <div class="result-verdict" id="resultVerdict">--</div>
+      <div class="result-desc"   id="resultDesc">--</div>
+      <div class="result-ev-adj" id="resultEVAdj"></div>
+    </div>
+  </div>
+</div>
+
+<!-- EV bar -->
+<div class="ebar" id="ebar">
+  <div class="ebar-labels"><span>Too Dark</span><span>Perfect</span><span>Overexposed</span></div>
+  <div class="ebar-track"><div class="needle" id="needle" style="left:50%"></div></div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="settings" id="settings">
+
+  <!-- 1. MiNT Time Machine -->
+  <div class="scard">
+    <div class="scard-label">MiNT Time Machine Dial</div>
+    <div class="scard-sub" id="tmSub">Set the dial on top of your camera to the highlighted setting.</div>
+    <!-- Auto modes first, then manual speeds. Tap any pill to test it. -->
+    <div class="tm-pills" id="tmPills">
+      <div class="pill interactive" data-tm="A100" onclick="tapTM('A100')">A100</div>
+      <div class="pill interactive" data-tm="A600" onclick="tapTM('A600')">A600</div>
+      <div class="pill tm-div">·</div>
+      <div class="pill interactive" data-tm="T" onclick="tapTM('T')">T</div>
+      <div class="pill interactive" data-tm="B" onclick="tapTM('B')">B</div>
+      <div class="pill interactive" data-tm="2"    onclick="tapTM('2')">½s</div>
+      <div class="pill interactive" data-tm="4"    onclick="tapTM('4')">¼s</div>
+      <div class="pill interactive" data-tm="8"    onclick="tapTM('8')">1/8</div>
+      <div class="pill interactive" data-tm="15"   onclick="tapTM('15')">1/15</div>
+      <div class="pill interactive" data-tm="30"   onclick="tapTM('30')">1/30</div>
+      <div class="pill interactive" data-tm="60"   onclick="tapTM('60')">1/60</div>
+      <div class="pill interactive" data-tm="125"  onclick="tapTM('125')">1/125</div>
+      <div class="pill interactive" data-tm="250"  onclick="tapTM('250')">1/250</div>
+      <div class="pill interactive" data-tm="500"  onclick="tapTM('500')">1/500</div>
+      <div class="pill interactive" data-tm="1000" onclick="tapTM('1000')">1/1000</div>
+    </div>
+    <div class="tip" id="tmTip" style="margin-top:10px">--</div>
+  </div>
+
+  <!-- 2. SX-70 Lighten/Darken Dial -->
+  <div class="scard">
+    <div class="scard-label">SX-70 Lighten / Darken Dial</div>
+    <div class="fwarn" id="fwarn">⚠ 600 film overexposes 2 stops in SX-70 — always push dial toward Dark.</div>
+    <!-- 5-segment dial — tap any segment to test. Green = recommended, purple = testing. -->
+    <div class="dial-seg-row" id="dialSegs">
+      <div class="dial-seg" data-d="0" onclick="tapDial(0)">
+        <span class="ds-icon">◀◀</span><span class="ds-lbl">Dark</span>
+      </div>
+      <div class="dial-seg" data-d="1" onclick="tapDial(1)">
+        <span class="ds-icon">◀</span><span class="ds-lbl">Darker</span>
+      </div>
+      <div class="dial-seg" data-d="2" onclick="tapDial(2)">
+        <span class="ds-icon">●</span><span class="ds-lbl">Centre</span>
+      </div>
+      <div class="dial-seg" data-d="3" onclick="tapDial(3)">
+        <span class="ds-icon">▶</span><span class="ds-lbl">Lighter</span>
+      </div>
+      <div class="dial-seg" data-d="4" onclick="tapDial(4)">
+        <span class="ds-icon">▶▶</span><span class="ds-lbl">Light</span>
+      </div>
+    </div>
+    <div class="dial-interactive-note" id="dialNote" style="display:none">Green = recommended · purple = testing · tap again to reset</div>
+  </div>
+
+  <!-- 3. Flash toggle -->
+  <div class="togrow" onclick="toggleFlash()">
+    <div>
+      <div class="togrow-l">⚡ Flash</div>
+      <div class="togrow-s" id="ftogsub">Tap to turn on flash guide</div>
+    </div>
+    <div class="tog" id="ftog"></div>
+  </div>
+
+  <!-- 4. Flash details -->
+  <div id="flashDetails" style="display:none">
+    <div class="ftabs">
+      <div class="ftab on" id="tabMint" onclick="setFType('mint')">Mint Flash<span class="fs">Variable power</span></div>
+      <div class="ftab"    id="tabBar"  onclick="setFType('bar')">MiNT FlashBar<span class="fs">10 fixed bulbs</span></div>
+    </div>
+
+    <!-- Mint Flash -->
+    <div class="scard" id="mintCard">
+      <div class="scard-label">Mint Flash Power</div>
+      <div class="pills" id="mintPills">
+        <div class="pill" data-p="0">OFF</div>
+        <div class="pill" data-p="1">1/16</div>
+        <div class="pill" data-p="2">1/8</div>
+        <div class="pill" data-p="3">1/4</div>
+        <div class="pill" data-p="4">1/2</div>
+        <div class="pill" data-p="5">FULL</div>
+      </div>
+      <div class="dist-note" id="mintDist">
+        <div class="dn-label">Best Subject Distance</div>
+        <div class="dn-value" id="mintDistVal">--</div>
+      </div>
+      <div class="tip" id="mintTip">--</div>
+    </div>
+
+    <!-- FlashBar -->
+    <div class="scard" id="barCard" style="display:none">
+      <div class="scard-label">MiNT FlashBar</div>
+      <div class="pills" id="barPills" style="margin-bottom:10px">
+        <div class="pill" data-bp="off">Don't Use</div>
+        <div class="pill" data-bp="on">Use Flash</div>
+      </div>
+      <div class="dist-note" id="barDist" style="display:none">
+        <div class="dn-label">Stay Within</div>
+        <div class="dn-value" id="barDistVal">--</div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="scard-label">Bulb Tracker — tap after each shot</div>
+        <div class="bcount" id="bcount">10 bulbs remaining</div>
+        <div class="bulb-grid" id="bgrid"></div>
+      </div>
+      <div class="tip" id="barTip">--</div>
+    </div>
+  </div>
+
+</div><!-- /settings -->
+
+<!-- Advanced EV + histogram -->
+<div class="adv-toggle" id="advToggle" style="display:none" onclick="toggleAdv()">▾ Show EV &amp; Histogram</div>
+<div class="adv-panel" id="advPanel">
+  <div class="adv-ev" id="advEV">--</div>
+  <div class="adv-src" id="advSrc"></div>
+  <canvas id="histCanvas"></canvas>
+  <div class="hilab"><span>SHADOWS</span><span>MIDTONES</span><span>HIGHLIGHTS</span></div>
+</div>
+
+<script>
+// ── Colours ──────────────────────────────────────────────────────────
+const ZC={
+  'very-dark':  ['#6366f1','#1e1b4b','#312e81'],
+  'dark':       ['#3b82f6','#1e3a8a','#1e3a8a'],
+  'good':       ['#10b981','#022c22','#065f46'],
+  'bright':     ['#f59e0b','#1c1200','#78350f'],
+  'very-bright':['#ef4444','#1c0a0a','#7f1d1d'],
+};
+function setZC(k){
+  const[fg,bg,dk]=ZC[k];
+  document.documentElement.style.setProperty('--z',fg);
+  document.documentElement.style.setProperty('--z2',bg);
+  document.documentElement.style.setProperty('--zd',dk);
+}
+
+// ── Film ─────────────────────────────────────────────────────────────
+const FILMS={'sx70-c':{eo:0},'sx70-b':{eo:0},'600-c':{eo:2},'600-b':{eo:2}};
+let filmKey='sx70-c';
+function setFilm(el){
+  document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); filmKey=el.dataset.f;
+  document.getElementById('fwarn').classList.toggle('on',filmKey.startsWith('600'));
+  if(running||pvMode) fullUpdate();
+}
+
+// ── Device ───────────────────────────────────────────────────────────
+const ua=navigator.userAgent;
+let isIphone=false,isAndroid=false,deviceAperture=1.8,deviceLabel='Camera';
+if(/iPhone/.test(ua)){isIphone=true;deviceLabel='iPhone';deviceAperture=1.6;}
+else if(/Android/.test(ua)){isAndroid=true;deviceLabel='Android';deviceAperture=1.8;}
+else if(/iPad/.test(ua)){deviceLabel='iPad';deviceAperture=1.8;}
+else{deviceLabel='Desktop';deviceAperture=2.0;}
+document.getElementById('dbadge').innerHTML='<b>'+deviceLabel+'</b> f/'+deviceAperture;
+
+// Show HTTPS note if on non-secure non-localhost
+if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+  document.getElementById('httpsNote').style.display='block';
+}
+
+// ── State ────────────────────────────────────────────────────────────
+const video=document.getElementById('video');
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const histCvs=document.getElementById('histCanvas');
+const histCtx=histCvs.getContext('2d');
+let smoothEV=10,running=false,pvMode=false,pvEV=14;
+let usingFlash=false,ftype='mint';
+let bulbs=new Array(10).fill(true);
+let videoTrack=null,useSensor=false,advOpen=false;
+let manualDial=null; // null = auto, 0-4 = user tapped a dial position
+let manualTM=null;   // null = auto, string = user tapped a TM pill to test
+
+// ── Preview scenes ───────────────────────────────────────────────────
+const SCENES=[
+  {i:'☀️',n:'Bright Day',   e:15,d:'EV 15 · sunny outdoors'},
+  {i:'⛅',n:'Overcast',     e:12,d:'EV 12 · cloudy day'},
+  {i:'🏠',n:'Indoor Bright',e:10,d:'EV 10 · well-lit room'},
+  {i:'🕯️',n:'Indoor Dim',  e:7, d:'EV 7 · dim room'},
+  {i:'🌆',n:'Golden Hour',  e:11,d:'EV 11 · magic hour'},
+  {i:'🌑',n:'Night/Dark',   e:4, d:'EV 4 · very dark'},
+];
+function buildScenes(){
+  const g=document.getElementById('sgrid'); g.innerHTML='';
+  SCENES.forEach((s,i)=>{
+    const b=document.createElement('div'); b.className='sb'+(i===0?' on':'');
+    b.innerHTML=`<span class="si">${s.i}</span><span class="sn">${s.n}</span><span class="se">${s.d}</span>`;
+    b.onclick=()=>pickScene(i); g.appendChild(b);
+  });
+}
+function pickScene(i){
+  document.querySelectorAll('.sb').forEach((b,j)=>b.classList.toggle('on',i===j));
+  const s=SCENES[i]; pvEV=s.e;
+  document.getElementById('pi').textContent=s.i;
+  document.getElementById('pl').textContent=s.n.toUpperCase();
+  document.getElementById('pe').textContent=s.d;
+  document.getElementById('advEV').textContent=s.e.toFixed(1);
+  fullUpdate();
+  if(advOpen) drawFakeHist(s.e);
+}
+
+function startPreview(){
+  pvMode=true;
+  document.getElementById('camPh').style.display='none';
+  document.getElementById('startBtn').style.display='none';
+  document.getElementById('prevBtn').style.display='none';
+  document.getElementById('pscreen').style.display='flex';
+  document.getElementById('sring').style.display='block';
+  document.getElementById('spick').style.display='block';
+  const cb=document.getElementById('cbadge');
+  cb.className='cbadge p'; cb.textContent='PREVIEW MODE'; cb.style.display='block';
+  showPanels(); buildScenes(); buildBulbs(); pickScene(0);
+  document.getElementById('dialNote').style.display='block';
+}
+
+// ── Camera ───────────────────────────────────────────────────────────
+function startCamera(){
+  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+    alert('Camera needs HTTPS.\n\nOn your Mac Terminal run:\n  python3 ~/sx70-meter/server.py\n\nThen open the https:// URL it shows on your phone.\n\nOr use Preview Mode to test without a camera.');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({
+    video:{facingMode:{ideal:'environment'},width:{ideal:640},height:{ideal:480}}
+  }).then(stream=>{
+    video.srcObject=stream; video.style.display='block';
+    document.getElementById('camPh').style.display='none';
+    document.getElementById('startBtn').style.display='none';
+    document.getElementById('prevBtn').style.display='none';
+    document.getElementById('sring').style.display='block';
+    document.getElementById('cam').classList.add('lit');
+    videoTrack=stream.getVideoTracks()[0];
+    try{const s=videoTrack.getSettings();useSensor=!!(s.exposureTime&&s.iso&&s.exposureTime>0&&s.iso>0);}catch(e){useSensor=false;}
+    const cb=document.getElementById('cbadge'); cb.style.display='block';
+    if(useSensor){cb.className='cbadge s';cb.textContent='SENSOR MODE · real EV';}
+    else{cb.className='cbadge px';cb.textContent=isIphone?'PIXEL MODE · iPhone':'PIXEL MODE · estimated';}
+    video.onloadedmetadata=()=>{
+      canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+      running=true; showPanels(); buildBulbs(); loop();
+    };
+  }).catch(e=>{
+    alert('Camera access denied.\n\n'+(isIphone?'iPhone: Settings → Safari → Camera → Allow':'Allow camera in your browser, then reload.'));
+  });
+}
+
+function showPanels(){
+  document.getElementById('zbar').style.display='block';
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('ebar').style.display='block';
+  document.getElementById('settings').style.display='block';
+  document.getElementById('advToggle').style.display='block';
+  document.getElementById('dialNote').style.display='block';
+}
+
+function loop(){
+  if(!running) return;
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  const{avg,hist}=analyzeFrame();
+  let ev,src;
+  if(useSensor){const s=sensorEV();ev=(s!==null?s:pixelEV(avg));src=(s!==null?'real sensor data':'estimated from brightness');}
+  else{ev=pixelEV(avg);src=isIphone?'estimated · iPhone Safari':'estimated from brightness';}
+  smoothEV=smoothEV*.75+ev*.25;
+  document.getElementById('advEV').textContent=smoothEV.toFixed(1);
+  document.getElementById('advSrc').textContent=src;
+  fullUpdate();
+  if(advOpen) drawHistogram(hist);
+  requestAnimationFrame(loop);
+}
+
+function analyzeFrame(){
+  const w=canvas.width,h=canvas.height;
+  const x0=Math.floor(w*.25),x1=Math.floor(w*.75),y0=Math.floor(h*.25),y1=Math.floor(h*.75);
+  const data=ctx.getImageData(0,0,w,h).data;
+  const hist=new Array(256).fill(0);
+  let sum=0,count=0;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    const i=(y*w+x)*4;
+    const lum=Math.round(.2126*data[i]+.7152*data[i+1]+.0722*data[i+2]);
+    hist[lum]++;
+    if(x>=x0&&x<x1&&y>=y0&&y<y1){sum+=lum;count++;}
+  }
+  return{avg:count?sum/count:0,hist};
+}
+function pixelEV(b){if(b<1)b=1;return Math.max(2,Math.min(18,11+Math.log2(b/128)));}
+function sensorEV(){
+  if(!videoTrack)return null;
+  try{const s=videoTrack.getSettings();
+    if(!s.exposureTime||!s.iso||s.exposureTime<=0)return null;
+    return Math.max(2,Math.min(18,Math.log2((deviceAperture*deviceAperture)/s.exposureTime)-Math.log2(s.iso/100)));
+  }catch(e){return null;}
+}
+
+// ── Master update ─────────────────────────────────────────────────────
+function fullUpdate(){
+  const ev=pvMode?pvEV:smoothEV;
+  updateZone(ev);
+  updateTM(ev);
+  updateDial(ev);
+  updateResult(ev);
+  if(usingFlash) updateFlash(ev);
+}
+
+// ── Zone ──────────────────────────────────────────────────────────────
+function updateZone(ev){
+  const eff=ev+FILMS[filmKey].eo;
+  const pct=Math.max(2,Math.min(98,((ev-4)/12)*100));
+  document.getElementById('needle').style.left=pct+'%';
+  let cls,name,hint;
+  if(eff<5){cls='very-dark';name='TOO DARK';hint='Way too dark — needs flash or much more light';}
+  else if(eff<8){cls='dark';name='UNDEREXPOSED';hint='Too dark — use flash or brighter light';}
+  else if(eff<10){cls='dark';name='SLIGHTLY DARK';hint='A bit dim — fill flash or lighten the dial';}
+  else if(eff<=13){cls='good';name='GOOD LIGHT';hint='Scene is well exposed';}
+  else if(eff<=15){cls='bright';name='TOO BRIGHT';hint='Bright — darken to avoid bleaching';}
+  else{cls='very-bright';name='OVEREXPOSED';hint='Way too bright — move to shade';}
+  setZC(cls);
+  document.getElementById('zname').textContent=name;
+  document.getElementById('zhint').textContent=hint;
+}
+
+// ── Time Machine ──────────────────────────────────────────────────────
+// Dial settings ordered on the actual dial:
+// T B 2 4 8 15 30 60 125 250 500 1000 A100 A600
+//
+// A100 = auto for SX-70 film (ISO 100-160)
+// A600 = auto for 600/i-Type film (ISO 640)
+// Numbers = 1/x second shutter speeds
+// T = time (open-close), B = bulb (hold)
+const TM_ORDER=['T','B','2','4','8','15','30','60','125','250','500','1000','A100','A600'];
+
+function updateTM(ev){
+  const eff=ev+FILMS[filmKey].eo;
+  const is600=filmKey.startsWith('600');
+  let rec,sub,tip;
+
+  // Primary recommendation: A100 for SX-70 film, A600 for 600 film
+  // In auto modes the camera handles exposure; manual speeds for creative control
+  if(is600){
+    // 600 film → A600 is the right auto mode
+    if(eff<5)      {rec='T';  tip='Very dark — use T (time exposure). Put camera on a stable surface. Press shutter once to open, again to close. Needs flash too.';}
+    else if(eff<7) {rec='2';  tip='Dark scene — try 1/2 sec shutter. Keep camera very steady or use a surface.';}
+    else if(eff<9) {rec='8';  tip='Dim scene — 1/8 sec. Hold camera steady against something solid.';}
+    else if(eff<11){rec='A600';tip='Good for 600 film — A600 is the right auto mode. Camera handles the rest.';}
+    else if(eff<14){rec='A600';tip='Good light — A600 auto mode is perfect here. The camera exposes correctly for your 600/i-Type film.';}
+    else           {rec='A600';tip='Bright scene — A600 auto mode. If shots are still too bright, push the lighten/darken dial toward Dark.';}
+    sub='600 film detected — A600 is your main auto mode.';
+  } else {
+    // SX-70 film → A100 is the right auto mode
+    if(eff<5)      {rec='T';   tip='Very dark — use T (time exposure). Camera on a surface. Press shutter once to open, again to close. Use flash if possible.';}
+    else if(eff<7) {rec='2';   tip='Dark scene — 1/2 sec shutter. Keep camera very still.';}
+    else if(eff<9) {rec='15';  tip='Dim indoor light — 1/15 sec is a good balance. Brace the camera.';}
+    else if(eff<11){rec='A100';tip='Indoor to overcast — A100 auto mode handles this range well for SX-70 film.';}
+    else if(eff<14){rec='A100';tip='Good light — A100 auto mode is ideal. The camera meters correctly for SX-70 film (ISO 160).';}
+    else           {rec='500'; tip='Bright sunny day — 1/500 sec to freeze motion and avoid overexposure. Or use A100 with dial pushed toward Dark.';}
+    sub='SX-70 film detected — A100 is your main auto mode.';
+  }
+
+  // Override tip/sub when user is testing a specific setting
+  if(manualTM!==null&&manualTM!==rec){
+    const lbl={'T':'Time (T)','B':'Bulb (B)','A100':'A100 Auto','A600':'A600 Auto',
+      '2':'½s','4':'¼s','8':'1/8s','15':'1/15s','30':'1/30s','60':'1/60s',
+      '125':'1/125s','250':'1/250s','500':'1/500s','1000':'1/1000s'}[manualTM]||manualTM;
+    tip=`Testing ${lbl} — tap it again to return to recommended (${rec}). Check estimated result above.`;
+  } else if(manualTM===rec){
+    tip+=' ✓ You are on the recommended setting.';
+  }
+
+  document.getElementById('tmSub').textContent=sub+(manualTM===null?' Tap any to test.':'');
+  document.getElementById('tmTip').textContent=tip;
+
+  // Only touch pills that have a data-tm (skip the divider element)
+  document.querySelectorAll('#tmPills .pill[data-tm]').forEach(p=>{
+    p.className='pill interactive';
+    if(manualTM!==null){
+      // Testing mode: purple for testing, dim green for recommended
+      if(p.dataset.tm===manualTM) p.classList.add('manual-sel');
+      else if(p.dataset.tm===rec) p.classList.add('near');
+    } else {
+      // Auto mode: green for recommended, dim for adjacent
+      if(p.dataset.tm===rec) p.classList.add('rec');
+      else{
+        const ri=TM_ORDER.indexOf(rec), pi=TM_ORDER.indexOf(p.dataset.tm);
+        if(ri>=0&&pi>=0&&Math.abs(pi-ri)===1) p.classList.add('near');
+      }
+    }
+  });
+
+  // Scroll to active pill (testing or recommended)
+  requestAnimationFrame(()=>{
+    const active=document.querySelector('#tmPills .pill.manual-sel')||
+                 document.querySelector('#tmPills .pill.rec');
+    const strip=document.getElementById('tmPills');
+    if(active&&strip){
+      const target=active.offsetLeft-(strip.offsetWidth/2)+(active.offsetWidth/2);
+      strip.scrollTo({left:Math.max(0,target),behavior:'smooth'});
+    }
+  });
+}
+
+// ── Dial ──────────────────────────────────────────────────────────────
+const DIAL_LABELS=['Max Dark','Darker','Centre','Lighter','Max Light'];
+const DIAL_EV=[-1.5,-0.75,0,0.75,1.5];
+
+function autoDialPos(ev){
+  const eff=ev+FILMS[filmKey].eo;
+  if(eff>15)return 0; if(eff>13)return 1;
+  if(eff>=10)return 2; if(eff>=8)return 3; return 4;
+}
+
+function tapDial(pos){
+  manualDial=(manualDial===pos)?null:pos; // tap again to return to auto
+  fullUpdate();
+}
+function tapTM(val){
+  manualTM=(manualTM===val)?null:val; // tap same pill again to clear
+  fullUpdate();
+}
+
+function updateDial(ev){
+  const auto=autoDialPos(ev);
+
+  document.querySelectorAll('#dialSegs .dial-seg').forEach(p=>{
+    const d=parseInt(p.dataset.d);
+    p.className='dial-seg';
+    if(manualDial!==null){
+      if(d===manualDial) p.classList.add('manual-sel');
+      else if(d===auto)  p.classList.add('near');
+    } else {
+      if(d===auto)                  p.classList.add('rec');
+      else if(Math.abs(d-auto)===1) p.classList.add('near');
+    }
+  });
+}
+
+// ── Photo result estimator ────────────────────────────────────────────
+function tmSpeedOffset(ev){
+  // When testing a manual TM speed, compute EV offset vs what auto would expose
+  if(!manualTM||['A100','A600','T','B'].includes(manualTM)) return 0;
+  const eff=ev+FILMS[filmKey].eo;
+  // idealSpeed = denominator of correct shutter fraction for this scene
+  // calibrated: EV 10 ≈ 1/30s correct for SX-70 auto
+  const idealSpeed=30*Math.pow(2,eff-10);
+  const chosenSpeed=parseFloat(manualTM);
+  // positive offset = slower than ideal = brighter; negative = faster = darker
+  return Math.max(-5,Math.min(5,Math.log2(idealSpeed/chosenSpeed)));
+}
+
+function updateResult(ev){
+  const dialPos=(manualDial!==null)?manualDial:autoDialPos(ev);
+  const dialOff=DIAL_EV[dialPos];
+  const filmOff=FILMS[filmKey].eo;
+  const tmOff=tmSpeedOffset(ev);
+  const finalEV=ev+filmOff+dialOff+tmOff;
+
+  let verdict,desc,bg,cls;
+  if(finalEV>15){
+    verdict='Blown Out'; cls='very-bright';
+    desc='Will be completely white and washed out. Push dial toward Dark.';
+    bg='linear-gradient(135deg,#fff 0%,#f0ede8 60%,#e8e4df 100%)';
+  } else if(finalEV>13){
+    verdict='Too Bright'; cls='bright';
+    desc='Highlights will bleach. Slightly overexposed for Polaroid film.';
+    bg='linear-gradient(135deg,#e0ddd8,#ccc9c2)';
+  } else if(finalEV>=10){
+    verdict='Looks Good!'; cls='good';
+    desc='Well exposed. Colours and shadows should come out naturally.';
+    bg='linear-gradient(135deg,#7c8a6e,#4a6040,#2a3d24)';
+  } else if(finalEV>=7){
+    verdict='Slightly Dark'; cls='dark';
+    desc='A bit underexposed. Shadows will be dense. Try lightening the dial one step.';
+    bg='linear-gradient(135deg,#2a2a2a,#1a1a1a)';
+  } else {
+    verdict='Too Dark'; cls='very-dark';
+    desc='Will come out nearly black. Need Max Lighten + flash.';
+    bg='linear-gradient(135deg,#111,#050505)';
+  }
+
+  setZC(cls);
+  document.getElementById('polSim').style.background=bg;
+  document.getElementById('resultVerdict').textContent=verdict;
+  document.getElementById('resultDesc').textContent=desc;
+  const filmPart=filmOff?` + film (${filmOff>0?'+':''}${filmOff})`:'';
+  const dialPart=` + dial (${dialOff>0?'+':''}${dialOff.toFixed(2)})`;
+  const tmPart=tmOff?` + TM (${tmOff>0?'+':''}${tmOff.toFixed(1)})`:'';
+  document.getElementById('resultEVAdj').textContent=
+    `Scene ${ev.toFixed(1)}${filmPart}${dialPart}${tmPart} = ${finalEV.toFixed(1)} EV`;
+}
+
+// ── Flash ──────────────────────────────────────────────────────────────
+function toggleFlash(){
+  usingFlash=!usingFlash;
+  document.getElementById('ftog').classList.toggle('on',usingFlash);
+  document.getElementById('flashDetails').style.display=usingFlash?'block':'none';
+  document.getElementById('ftogsub').textContent=usingFlash?'Flash guide on':'Tap to turn on flash guide';
+  if(usingFlash) updateFlash(pvMode?pvEV:smoothEV);
+}
+function setFType(t){
+  ftype=t;
+  document.getElementById('tabMint').classList.toggle('on',t==='mint');
+  document.getElementById('tabBar').classList.toggle('on',t==='bar');
+  document.getElementById('mintCard').style.display=t==='mint'?'block':'none';
+  document.getElementById('barCard').style.display=t==='bar'?'block':'none';
+  updateFlash(pvMode?pvEV:smoothEV);
+}
+function updateFlash(ev){
+  if(ftype==='mint') updateMintFlash(ev);
+  else updateFlashBar(ev);
+}
+function updateMintFlash(ev){
+  const eff=ev+FILMS[filmKey].eo;
+  let rec,dist,tip;
+  if(eff<5)      {rec=5;dist='0.5–1.5 m';tip='Very dark — flash is your only light. Stay close (arm\'s reach). Pair with dial at Max Light.';}
+  else if(eff<8) {rec=4;dist='0.6–2 m';  tip='Low light — flash is main source. 1/2 power, stay within 2 m. Dial toward Lighter.';}
+  else if(eff<10){rec=3;dist='0.6–2.5 m';tip='Dim — 1/4 power fills harsh shadows. Dial near Centre.';}
+  else if(eff<=12){rec=2;dist='1–3 m';   tip='Good light — gentle 1/8 fill for shadows. Easy to over-flash, stay 1–3 m.';}
+  else if(eff<=14){rec=1;dist='—';       tip='Bright — 1/16 only for deep shadows. Better to skip flash and use dial toward Dark.';}
+  else            {rec=0;dist='—';       tip='Too bright — flash will blow your Polaroid out. Skip flash, push dial to Max Dark.';}
+  document.getElementById('mintDistVal').textContent=dist;
+  document.getElementById('mintTip').textContent=tip;
+  document.querySelectorAll('#mintPills .pill').forEach(p=>{
+    const d=parseInt(p.dataset.p); p.className='pill';
+    if(d===rec)              p.classList.add('rec');
+    else if(Math.abs(d-rec)===1) p.classList.add('near');
+  });
+}
+function updateFlashBar(ev){
+  const eff=ev+FILMS[filmKey].eo;
+  const rem=bulbs.filter(Boolean).length;
+  let use,dist,tip;
+  if(rem===0){use=false;dist='—';tip='All 10 bulbs used — replace the FlashBar cartridge.';}
+  else if(eff<6) {use=true; dist='0.5–1.2 m';tip='Very dark — FlashBar essential. Fixed power, stay close (0.5–1.2 m).';}
+  else if(eff<9) {use=true; dist='0.6–1.8 m';tip='Low light — FlashBar is main light. Stay within 1.8 m.';}
+  else if(eff<11){use=true; dist='0.8–2 m'; tip='Dim — FlashBar fill at 0.8–2 m. Great for indoor portraits.';}
+  else if(eff<=13){use=false;dist='1–2.5 m';tip='Good light — FlashBar optional. Save bulbs unless subject has deep shadows.';}
+  else            {use=false;dist='—';       tip='Too bright — FlashBar will overexpose. Skip it, push dial toward Dark.';}
+  document.querySelectorAll('#barPills .pill').forEach(p=>{
+    p.className='pill';
+    if(p.dataset.bp==='on'&&use)   p.classList.add('rec');
+    if(p.dataset.bp==='off'&&!use) p.classList.add('rec');
+    if(p.dataset.bp==='on'&&!use&&rem>0) p.classList.add('near');
+  });
+  document.getElementById('barDist').style.display=use?'block':'none';
+  document.getElementById('barDistVal').textContent=dist;
+  document.getElementById('barTip').textContent=tip;
+}
+
+// ── Bulbs ──────────────────────────────────────────────────────────────
+function buildBulbs(){
+  const g=document.getElementById('bgrid'); g.innerHTML='';
+  for(let i=0;i<10;i++){
+    const b=document.createElement('div');
+    b.className='bulb y'; b.textContent=i+1; b.onclick=()=>tapBulb(i);
+    g.appendChild(b);
+  }
+}
+function tapBulb(i){
+  bulbs[i]=!bulbs[i];
+  document.querySelectorAll('.bulb')[i].className='bulb '+(bulbs[i]?'y':'n');
+  const rem=bulbs.filter(Boolean).length;
+  document.getElementById('bcount').textContent=
+    rem===0?'All bulbs used — replace FlashBar':rem+' bulb'+(rem===1?'':'s')+' remaining';
+  updateFlash(pvMode?pvEV:smoothEV);
+}
+
+// ── Advanced ───────────────────────────────────────────────────────────
+function toggleAdv(){
+  advOpen=!advOpen;
+  document.getElementById('advPanel').style.display=advOpen?'block':'none';
+  document.getElementById('advToggle').textContent=advOpen?'▴ Hide EV & Histogram':'▾ Show EV & Histogram';
+  if(advOpen&&pvMode) drawFakeHist(pvEV);
+}
+function drawHistogram(hist){
+  const w=histCvs.offsetWidth||320,h=40;
+  histCvs.width=w; histCvs.height=h;
+  let max=1; for(let i=5;i<251;i++) max=Math.max(max,hist[i]);
+  histCtx.clearRect(0,0,w,h);
+  histCtx.fillStyle='#0c1428';histCtx.fillRect(0,0,w*.2,h);
+  histCtx.fillStyle='#0a1a10';histCtx.fillRect(w*.2,0,w*.6,h);
+  histCtx.fillStyle='#1c0a0a';histCtx.fillRect(w*.8,0,w*.2,h);
+  const bw=w/256;
+  for(let i=0;i<256;i++){
+    const bh=(hist[i]/max)*h*.92,t=i/255;
+    histCtx.fillStyle=`rgba(${Math.round(t*200+55)},${Math.round(Math.max(0,180-Math.abs(i-128)*1.2))},${Math.round((1-t)*200+55)},.85)`;
+    histCtx.fillRect(i*bw,h-bh,bw+.5,bh);
+  }
+  histCtx.strokeStyle='rgba(255,255,255,.07)';histCtx.setLineDash([2,4]);
+  histCtx.beginPath();histCtx.moveTo(w/2,0);histCtx.lineTo(w/2,h);histCtx.stroke();
+  histCtx.setLineDash([]);
+}
+function drawFakeHist(ev){
+  const hist=new Array(256).fill(0);
+  const c=Math.round(((ev-4)/14)*255);
+  for(let i=0;i<256;i++) hist[i]=Math.max(0,500-Math.pow(Math.abs(i-c),.8)*3);
+  drawHistogram(hist);
+}
+</script>
+</body>
+</html>
