@@ -771,7 +771,10 @@ function updateDial(ev){
 
 // Photo result estimator
 function tmSpeedOffset(ev){
-  if(!manualTM||['A100','A600','T','B'].includes(manualTM)) return 0;
+  if(!manualTM||manualTM==='A100'||manualTM==='T'||manualTM==='B') return 0;
+  // A600 gives 2 stops less exposure than A100 (compensates for 600 film speed).
+  // With 600 film (eo +2): net 0 = correct. With SX-70 film (eo 0): net -2 = underexposed.
+  if(manualTM==='A600') return -2;
   const eff=ev+FILMS[filmKey].eo;
   const idealSpeed=30*Math.pow(2,eff-10);
   const chosenSpeed=parseFloat(manualTM);
@@ -825,11 +828,11 @@ function updateResult(ev){
     if(testing){
       // Apply filter directly to video — works on iOS where z-index overlays don't
       const filters={
-        'very-bright':'brightness(2.5) saturate(0.3) contrast(0.6)',
-        'bright':      'brightness(1.7) saturate(0.6)',
-        'good':        'brightness(1.0) saturate(1.0)',
-        'dark':        'brightness(0.35) saturate(0.8)',
-        'very-dark':   'brightness(0.08) saturate(0.5)',
+        'very-bright':'brightness(3) saturate(0) contrast(0.5)',
+        'bright':      'brightness(1.8) saturate(0.5)',
+        'good':        'brightness(1.05) saturate(1.1) hue-rotate(10deg)',
+        'dark':        'brightness(0.25) saturate(0.7)',
+        'very-dark':   'brightness(0.05) saturate(0.3)',
       };
       video.style.filter=filters[cls]||'';
     } else {
