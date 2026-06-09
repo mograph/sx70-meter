@@ -196,21 +196,44 @@ body{
   background:var(--z);box-shadow:0 0 12px var(--z),0 0 24px var(--z);
   transform:translateX(-50%);transition:left .35s ease,background .3s,box-shadow .3s;}
 
-/* Dial segments */
-.dial-seg-row{display:flex;width:100%;margin:0 0 5px;border-radius:12px;overflow:hidden;border:1.5px solid #1a1a1a;}
-.dial-seg{flex:1;padding:9px 4px 7px;text-align:center;cursor:pointer;
-  border-right:1px solid #1a1a1a;background:#0a0a0a;
-  -webkit-tap-highlight-color:transparent;transition:all .2s;
-  display:flex;flex-direction:column;align-items:center;gap:3px;}
-.dial-seg:last-child{border-right:none;}
-.dial-seg .ds-icon{font-size:12px;line-height:1;}
-.dial-seg .ds-lbl{font-size:7px;font-weight:700;color:#333;letter-spacing:.4px;white-space:nowrap;}
-.dial-seg.rec{background:var(--z);border-color:var(--z);}
-.dial-seg.rec .ds-icon,.dial-seg.rec .ds-lbl{color:#000;}
-.dial-seg.near{background:var(--z2);border-color:var(--z);}
-.dial-seg.near .ds-lbl{color:var(--z);}
-.dial-seg.manual-sel{background:#1a0a2e;border-color:#a78bfa;}
-.dial-seg.manual-sel .ds-icon,.dial-seg.manual-sel .ds-lbl{color:#a78bfa;}
+/* Dial slider */
+.dial-slider-wrap{position:relative;padding:4px 0 0;margin-bottom:4px;}
+.dial-slider-wrap input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:34px;background:transparent;cursor:pointer;
+  position:relative;z-index:2;margin:0;
+}
+.dial-slider-wrap input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:34px;
+  background:var(--z);border-radius:3px;
+  box-shadow:0 0 12px var(--z),0 0 24px var(--z);
+  transition:background .3s,box-shadow .3s;
+}
+.dial-slider-wrap input[type=range]::-webkit-slider-runnable-track{
+  height:34px;background:transparent;
+}
+.dial-slider-wrap input[type=range]::-moz-range-thumb{
+  width:14px;height:34px;border-radius:3px;border:none;
+  background:var(--z);box-shadow:0 0 12px var(--z);
+}
+.dial-slider-wrap input[type=range]::-moz-range-track{
+  height:34px;background:transparent;
+}
+.dial-knurl-bg{position:absolute;inset:0;border-radius:9px;overflow:hidden;pointer-events:none;
+  background:repeating-linear-gradient(
+    90deg,
+    #0e0e0e 0px,#0e0e0e 2px,
+    #1c1c1c 2px,#1c1c1c 4px,
+    #141414 4px,#141414 7px,
+    #0a0a0a 7px,#0a0a0a 10px
+  );
+  border:1.5px solid #2a2a2a;}
+.dial-ticks{display:flex;justify-content:space-between;padding:0 1px;margin-bottom:5px;}
+.dial-tick{font-size:8px;color:#333;font-weight:700;text-align:center;width:0;white-space:nowrap;transition:color .3s;}
+.dial-tick.rec{color:var(--z);}
+.dial-tick.active{color:#a78bfa;}
+.dial-val{text-align:center;font-size:9px;color:#444;margin-bottom:4px;letter-spacing:.5px;min-height:12px;transition:color .3s;}
+.dial-val.manual{color:#a78bfa;}
 
 /* Toggle rows */
 .togrow{display:flex;justify-content:space-between;align-items:center;
@@ -402,27 +425,20 @@ body{
   <div class="scard">
     <div class="scard-label">SX-70 Lighten / Darken Dial</div>
     <div class="fwarn" id="fwarn">⚠ 600 film overexposes 2 stops in SX-70 — always push dial toward Dark.</div>
-    <div class="dial-knurl">
-      <div class="dial-knurl-pos" id="dialKnurlPos" style="left:50%"></div>
+    <div class="dial-slider-wrap">
+      <div class="dial-knurl-bg"></div>
+      <input type="range" id="dialSlider" min="-1.5" max="1.5" step="0.125" value="0"
+        oninput="onDialSlider(this.value)" onchange="onDialSlider(this.value)">
     </div>
-    <div class="dial-seg-row" id="dialSegs">
-      <div class="dial-seg" data-d="0" onclick="tapDial(0)">
-        <span class="ds-icon">◀◀</span><span class="ds-lbl">Dark</span>
-      </div>
-      <div class="dial-seg" data-d="1" onclick="tapDial(1)">
-        <span class="ds-icon">◀</span><span class="ds-lbl">Darker</span>
-      </div>
-      <div class="dial-seg" data-d="2" onclick="tapDial(2)">
-        <span class="ds-icon">●</span><span class="ds-lbl">Centre</span>
-      </div>
-      <div class="dial-seg" data-d="3" onclick="tapDial(3)">
-        <span class="ds-icon">▶</span><span class="ds-lbl">Lighter</span>
-      </div>
-      <div class="dial-seg" data-d="4" onclick="tapDial(4)">
-        <span class="ds-icon">▶▶</span><span class="ds-lbl">Light</span>
-      </div>
+    <div class="dial-ticks">
+      <span class="dial-tick" data-ev="-1.5">MAX DARK</span>
+      <span class="dial-tick" data-ev="-0.75">DARKER</span>
+      <span class="dial-tick" data-ev="0">CENTRE</span>
+      <span class="dial-tick" data-ev="0.75">LIGHTER</span>
+      <span class="dial-tick" data-ev="1.5">MAX LIGHT</span>
     </div>
-    <div class="dial-interactive-note" id="dialNote" style="display:none">Green = recommended · purple = testing · tap again to reset</div>
+    <div class="dial-val" id="dialVal" ondblclick="resetDial()" ontouchend="resetDial()"></div>
+    <div class="dial-interactive-note" id="dialNote" style="display:none">Drag to adjust · tap label to reset to auto</div>
   </div>
 
   <!-- 3. Flash toggle -->
@@ -761,17 +777,24 @@ function updateTM(ev){
 }
 
 // Dial
-const DIAL_LABELS=['Max Dark','Darker','Centre','Lighter','Max Light'];
-const DIAL_EV=[-1.5,-0.75,0,0.75,1.5];
-
-function autoDialPos(ev){
+function autoDialEV(ev){
   const eff=ev+FILMS[filmKey].eo;
-  if(eff>15)return 0; if(eff>13)return 1;
-  if(eff>=10)return 2; if(eff>=8)return 3; return 4;
+  if(eff>15)return -1.5; if(eff>13)return -0.75;
+  if(eff>=10)return 0;   if(eff>=8)return 0.75; return 1.5;
 }
 
-function tapDial(pos){
-  manualDial=(manualDial===pos)?null:pos;
+let dialUserTouched=false;
+function onDialSlider(val){
+  manualDial=parseFloat(val);
+  dialUserTouched=true;
+  fullUpdate();
+}
+// Double-tap the slider label area resets to auto
+function resetDial(){
+  manualDial=null; dialUserTouched=false;
+  const slider=document.getElementById('dialSlider');
+  const auto=autoDialEV(pvMode?pvEV:smoothEV);
+  slider.value=auto;
   fullUpdate();
 }
 function tapTM(val){
@@ -780,20 +803,32 @@ function tapTM(val){
 }
 
 function updateDial(ev){
-  const auto=autoDialPos(ev);
-  const active=manualDial!==null?manualDial:auto;
-  document.getElementById('dialKnurlPos').style.left=(active*25)+'%';
-  document.querySelectorAll('#dialSegs .dial-seg').forEach(p=>{
-    const d=parseInt(p.dataset.d);
-    p.className='dial-seg';
+  const autoEV=autoDialEV(ev);
+  const activeEV=manualDial!==null?manualDial:autoEV;
+  const slider=document.getElementById('dialSlider');
+  // Only move slider if user isn't actively dragging
+  if(manualDial===null) slider.value=autoEV;
+  // Tick highlights
+  document.querySelectorAll('.dial-tick').forEach(t=>{
+    const tev=parseFloat(t.dataset.ev);
+    t.className='dial-tick';
     if(manualDial!==null){
-      if(d===manualDial) p.classList.add('manual-sel');
-      else if(d===auto)  p.classList.add('near');
+      if(Math.abs(tev-manualDial)<0.05) t.classList.add('active');
     } else {
-      if(d===auto)                  p.classList.add('rec');
-      else if(Math.abs(d-auto)===1) p.classList.add('near');
+      if(Math.abs(tev-autoEV)<0.05) t.classList.add('rec');
     }
   });
+  // Value label
+  const valEl=document.getElementById('dialVal');
+  if(manualDial!==null){
+    const sign=manualDial>0?'+':'';
+    valEl.textContent=`${sign}${manualDial.toFixed(2)} EV  ·  double-tap to reset`;
+    valEl.className='dial-val manual';
+  } else {
+    const sign=autoEV>0?'+':'';
+    valEl.textContent=`Auto: ${sign}${autoEV.toFixed(2)} EV`;
+    valEl.className='dial-val';
+  }
 }
 
 // Photo result estimator
@@ -809,8 +844,7 @@ function tmSpeedOffset(ev){
 }
 
 function updateResult(ev){
-  const dialPos=(manualDial!==null)?manualDial:autoDialPos(ev);
-  const dialOff=DIAL_EV[dialPos];
+  const dialOff=(manualDial!==null)?manualDial:autoDialEV(ev);
   const filmOff=FILMS[filmKey].eo;
   const tmOff=tmSpeedOffset(ev);
   const finalEV=ev+filmOff+dialOff+tmOff;
