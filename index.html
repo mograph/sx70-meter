@@ -301,6 +301,144 @@ body{
 .adv-src{text-align:center;font-size:9px;color:#333;letter-spacing:1px;margin-bottom:7px;}
 #histCanvas{width:100%;height:36px;border-radius:5px;display:block;}
 .hilab{display:flex;justify-content:space-between;font-size:8px;color:#1e1e1e;margin-top:3px;letter-spacing:1px;}
+
+/* ===== Multi-camera selector + advisor ===== */
+.cam-select{max-width:440px;margin:0 auto 12px;}
+.cam-select label{display:none;}
+.cam-select select{width:100%;appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;
+  background:#0c0c0f;color:#fff;border:1.5px solid #232323;border-radius:14px;
+  padding:12px 36px 12px 36px;font-size:15px;font-weight:800;letter-spacing:.6px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;}
+
+#advisor{max-width:440px;margin:0 auto;}
+.adv-cam-name{font-size:15px;font-weight:900;color:#fff;letter-spacing:1px;text-align:center;margin:2px 0 2px;}
+.adv-cam-sub{font-size:9px;color:#555;text-align:center;letter-spacing:1px;margin-bottom:11px;}
+
+/* Upload dropzone */
+.drop{display:block;position:relative;border:1.5px dashed #2a2a2a;border-radius:16px;
+  background:#0a0a0c;cursor:pointer;overflow:hidden;margin-bottom:10px;
+  -webkit-tap-highlight-color:transparent;}
+.drop-inner{display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 18px;text-align:center;}
+.drop-ic{font-size:30px;}
+.drop-t{font-size:12px;font-weight:700;color:#888;}
+.drop-s{font-size:9px;color:#444;max-width:250px;line-height:1.6;}
+.up-img{width:100%;max-height:230px;object-fit:contain;background:#000;display:block;}
+.drop.has{border-style:solid;border-color:#1a1a1a;}
+.drop.has::after{content:'tap to replace';position:absolute;bottom:7px;right:8px;font-size:8px;
+  color:#aaa;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:10px;letter-spacing:1px;backdrop-filter:blur(6px);}
+
+/* EXIF chips */
+.exif-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.exif-chip{font-size:9px;font-weight:700;color:#99a;background:#0c0c0f;border:1px solid #1c1c1c;
+  border-radius:8px;padding:5px 8px;letter-spacing:.5px;}
+.exif-chip b{color:#fff;}
+.exif-chip.warn{color:#fb923c;border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.06);}
+
+#advHist{width:100%;height:42px;border-radius:6px;display:block;}
+.adv-scene{font-size:10px;color:#777;margin-top:8px;line-height:1.5;}
+
+/* Mode tabs reuse .ftabs/.ftab */
+#advisor .ftabs{margin-bottom:9px;}
+
+/* Chip rows (scenario + fps) */
+.chip-row{display:flex;gap:6px;margin:0 auto 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0;padding:7px 11px;border-radius:20px;border:1.5px solid #1e1e1e;
+  font-size:10px;font-weight:700;color:#444;cursor:pointer;white-space:nowrap;text-align:center;
+  -webkit-tap-highlight-color:transparent;transition:all .15s;}
+.chip.on{border-color:var(--z);background:var(--z2);color:var(--z);}
+.chip .ce{display:block;font-size:8px;color:#3a3a3a;font-weight:400;margin-top:1px;letter-spacing:.5px;}
+.chip.on .ce{color:var(--z);opacity:.65;}
+
+/* Recommendation */
+.reco-verdict{border-radius:14px;padding:11px 13px;margin-bottom:9px;border:1px solid;}
+.reco-verdict .rv-t{font-size:13px;font-weight:800;letter-spacing:.3px;margin-bottom:4px;}
+.reco-verdict .rv-d{font-size:10px;line-height:1.6;color:#aaa;}
+.set-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px;}
+.set-cell{background:#0c0c0f;border:1px solid #161616;border-radius:12px;padding:9px 6px;text-align:center;}
+.set-cell .sc-l{font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.set-cell .sc-v{font-size:15px;font-weight:900;color:var(--z);font-variant-numeric:tabular-nums;line-height:1.15;
+  transition:color .3s;word-break:break-word;}
+.set-cell .sc-s{font-size:8px;color:#444;margin-top:3px;letter-spacing:.3px;}
+.set-cell.hl{border-color:var(--z);box-shadow:0 0 12px rgba(16,185,129,.16);}
+.reco-tips{margin:0;padding-left:16px;}
+.reco-tips li{font-size:10px;color:#888;line-height:1.65;margin-bottom:4px;}
+.reco-tips li b{color:#bbb;}
+.sec-h{font-size:9px;color:#666;letter-spacing:2px;text-transform:uppercase;margin:15px 2px 8px;padding-top:13px;border-top:1px solid #141414;}
+.reco-est{font-size:10px;color:#fb923c;line-height:1.55;margin:2px 2px 2px;
+  background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.2);border-radius:9px;padding:7px 10px;}
+
+/* How-to accordion */
+.howto-h{font-size:9px;color:#666;letter-spacing:2px;text-transform:uppercase;margin:15px 2px 3px;padding-top:13px;border-top:1px solid #141414;}
+.howto-c{font-size:9px;color:#3a3a3a;margin:0 2px 9px;letter-spacing:.5px;line-height:1.5;}
+.ht-item{background:#0c0c0f;border:1px solid #161616;border-radius:12px;margin-bottom:7px;overflow:hidden;}
+.ht-q{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ht-t{font-size:12px;font-weight:700;color:#bbb;}
+.ht-t .hti{margin-right:8px;}
+.ht-c{font-size:18px;color:#444;line-height:1;transition:transform .2s;}
+.ht-item.open .ht-c{transform:rotate(45deg);color:var(--z);}
+.ht-a{display:none;padding:0 13px 13px;}
+.ht-item.open .ht-a{display:block;}
+.ht-path{font-size:9px;color:var(--z);background:var(--z2);border:1px solid var(--zd);border-radius:7px;
+  padding:5px 9px;letter-spacing:.5px;margin-bottom:9px;display:inline-block;}
+.ht-steps{margin:0;padding-left:17px;}
+.ht-steps li{font-size:11px;color:#9a9a9a;line-height:1.7;margin-bottom:5px;}
+.ht-steps li b{color:#e2e2e2;}
+.ht-note{font-size:10px;color:#666;margin-top:8px;line-height:1.6;font-style:italic;
+  border-left:2px solid #222;padding-left:9px;}
+
+/* Live-preview match (current vs target) */
+.live-wrap{display:none;position:relative;border-radius:14px;overflow:hidden;
+  border:1.5px solid var(--zd);margin-bottom:10px;}
+.live-wrap video{width:100%;display:block;background:#000;max-height:240px;object-fit:cover;}
+.live-badge{position:absolute;top:7px;left:8px;font-size:8px;font-weight:700;letter-spacing:1px;
+  background:rgba(239,68,68,.85);color:#fff;padding:3px 8px;border-radius:10px;}
+.d-row{display:flex;align-items:center;gap:8px;background:#0c0c0f;border:1px solid #161616;
+  border-radius:11px;padding:10px 12px;margin-bottom:6px;}
+.d-row.dmatch{border-color:var(--zd);background:var(--z2);}
+.d-l{font-size:11px;font-weight:700;color:#aaa;flex:1;min-width:0;}
+.d-mid{font-size:12px;font-weight:800;color:#fff;text-align:center;flex:1.4;
+  font-variant-numeric:tabular-nums;}
+.d-row.dmatch .d-mid{color:var(--z);}
+.d-tag{font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;flex:0 0 auto;
+  border:1px solid #1e1e1e;border-radius:6px;padding:2px 6px;}
+.adv-live-btn{display:block;width:100%;margin-top:13px;padding:12px;border-radius:12px;
+  border:1.5px solid var(--zd);background:var(--z2);color:var(--z);font-size:11px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.adv-live-btn.on{border-color:#ef4444;background:rgba(239,68,68,.08);color:#f87171;}
+.d-read{font-size:9px;color:#777;letter-spacing:.5px;margin:0 2px 9px;line-height:1.5;}
+.d-read b{color:#aaa;}
+.d-sony{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:9px;
+  background:var(--z2);border:1px solid var(--zd);border-radius:11px;padding:10px 12px;}
+.d-sony-l{font-size:10px;color:#888;font-weight:700;}
+.d-sony-v{font-size:13px;font-weight:900;color:var(--z);font-variant-numeric:tabular-nums;text-align:right;}
+
+/* "Do this now" numbered checklist */
+.do-now{counter-reset:dn;list-style:none;padding:0;margin:0;}
+.do-now li{position:relative;padding:10px 12px 11px 42px;background:#0c0c0f;border:1px solid #161616;
+  border-radius:11px;margin-bottom:7px;}
+.do-now li::before{counter-increment:dn;content:counter(dn);position:absolute;left:9px;top:9px;
+  width:24px;height:24px;border-radius:50%;background:var(--z);color:#000;font-size:12px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;transition:background .3s;}
+.do-now .dn-t{font-size:12.5px;font-weight:800;color:#fff;line-height:1.3;}
+.do-now .dn-h{font-size:10.5px;color:#8a8a8a;margin-top:3px;line-height:1.55;}
+.do-now .dn-h b{color:#cfcfcf;}
+
+/* Plain-language glossary */
+.gl{font-size:11px;color:#9a9a9a;line-height:1.6;margin-bottom:9px;}
+.gl:last-child{margin-bottom:0;}
+.gl b{color:#e8e8e8;}
+
+/* Live look-preview overlay */
+.look-ov{position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;
+  background:transparent;transition:background .35s;}
+.look-badge{position:absolute;top:7px;right:8px;font-size:8px;font-weight:800;letter-spacing:1px;
+  background:rgba(16,185,129,.85);color:#000;padding:3px 8px;border-radius:10px;display:none;z-index:2;}
+.look-btn{display:block;width:100%;margin-bottom:11px;padding:10px;border-radius:11px;
+  border:1.5px solid var(--zd);background:var(--z2);color:var(--z);font-size:10px;font-weight:800;
+  letter-spacing:.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.look-btn.off{border-color:#1e1e1e;background:#0c0c0f;color:#777;}
 </style>
 </head>
 <body>
@@ -310,6 +448,20 @@ body{
   <div class="logo">SX-70 Meter</div>
   <div class="dbadge" id="dbadge">detecting…</div>
 </div>
+
+<!-- Camera model selector -->
+<div class="cam-select">
+  <label>Camera</label>
+  <select id="modelSel" onchange="setModel(this.value)">
+    <option value="sx70">Polaroid SX-70</option>
+    <option value="a7s">Sony A7S</option>
+    <option value="a7s2">Sony A7S II</option>
+    <option value="g7x">Canon G7 X</option>
+  </select>
+</div>
+
+<!-- ===== SX-70 live-meter app ===== -->
+<div id="sx70App">
 
 <!-- Film selector -->
 <div class="film-row">
@@ -504,6 +656,60 @@ body{
   <div class="adv-src" id="advSrc"></div>
   <canvas id="histCanvas"></canvas>
   <div class="hilab"><span>SHADOWS</span><span>MIDTONES</span><span>HIGHLIGHTS</span></div>
+</div>
+
+</div><!-- /#sx70App -->
+
+<!-- ===== Multi-camera photo advisor (non-SX-70) ===== -->
+<div id="advisor" style="display:none">
+  <div class="adv-cam-name" id="advCamName">—</div>
+  <div class="adv-cam-sub"  id="advCamSub">—</div>
+
+  <div class="ftabs" id="intentTabs">
+    <div class="ftab on" id="tabShoot" onclick="setIntent('shoot')">Shoot a scene<span class="fs">what to set</span></div>
+    <div class="ftab"    id="tabMatch" onclick="setIntent('match')">Match a look<span class="fs">replicate a photo</span></div>
+  </div>
+
+  <label class="drop" id="dropZone">
+    <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)" hidden>
+    <div class="drop-inner" id="dropInner">
+      <span class="drop-ic">🖼️</span>
+      <span class="drop-t">Tap to upload a photo</span>
+      <span class="drop-s" id="dropSub">Upload your shot to grade its exposure — I read the EXIF + histogram</span>
+    </div>
+    <img id="upImg" class="up-img" style="display:none" alt="">
+  </label>
+
+  <div class="exif-row" id="exifRow" style="display:none"></div>
+
+  <div class="scard" id="advHistCard" style="display:none">
+    <div class="scard-label">Scene Histogram</div>
+    <canvas id="advHist"></canvas>
+    <div class="hilab"><span>SHADOWS</span><span>MIDTONES</span><span>HIGHLIGHTS</span></div>
+    <div class="adv-scene" id="advScene"></div>
+  </div>
+
+  <div class="ftabs" id="modeTabs">
+    <div class="ftab on" id="tabPhoto" onclick="setAdvMode('photo')">Photo<span class="fs">stills</span></div>
+    <div class="ftab"    id="tabVideo" onclick="setAdvMode('video')">Video<span class="fs">S-Log</span></div>
+  </div>
+
+  <div class="chip-row" id="scenRow"></div>
+  <div class="chip-row" id="fpsWrap" style="display:none"></div>
+
+  <div class="live-wrap" id="liveWrap">
+    <span class="live-badge">● LIVE</span>
+    <video id="advVideo" autoplay playsinline muted></video>
+    <div class="look-ov" id="lookOverlay"></div>
+    <span class="look-badge" id="lookBadge">LOOK ≈ TARGET</span>
+  </div>
+
+  <div id="recoCard" style="display:none">
+    <div id="recoBody"></div>
+  </div>
+
+  <div id="glossCard" style="display:none"></div>
+  <div id="howtoCard" style="display:none"></div>
 </div>
 
 <script>
@@ -1037,6 +1243,873 @@ function drawFakeHist(ev){
   for(let i=0;i<256;i++) hist[i]=Math.max(0,500-Math.pow(Math.abs(i-c),.8)*3);
   drawHistogram(hist);
 }
+
+/* ===================================================================
+   MULTI-CAMERA PHOTO ADVISOR  (Sony A7S / A7S II / Canon G7 X)
+   Reads EXIF + histogram from an uploaded photo and recommends
+   exposure settings for stills & S-Log video.
+   =================================================================== */
+
+// --- Camera profiles (edit / add bodies here) ---
+const PROFILES={
+  a7s:{ id:'a7s', name:'Sony A7S', sensor:'12 MP full-frame',
+    hasLog:true, logName:'S-Log2', altLog:'S-Log3 (fw 2.0+)', greyIRE:32,
+    logFloorISO:3200, ettr:1.7, isoMin:100, isoMax:409600, isoLogMax:51200,
+    lensMinN:1.8, lensMaxN:16, hasND:true,
+    cleanNote:'clean well past ISO 12800' },
+  a7s2:{ id:'a7s2', name:'Sony A7S II', sensor:'12 MP full-frame',
+    hasLog:true, logName:'S-Log3', altLog:'S-Log2', greyIRE:41,
+    logFloorISO:1600, ettr:1.5, isoMin:100, isoMax:409600, isoLogMax:51200,
+    lensMinN:1.8, lensMaxN:16, hasND:true,
+    cleanNote:'clean well past ISO 12800' },
+  g7x:{ id:'g7x', name:'Canon G7 X', sensor:'1-inch 20 MP',
+    hasLog:false, logName:'Neutral', altLog:'', greyIRE:null,
+    logFloorISO:125, ettr:0.3, isoMin:125, isoMax:12800, isoLogMax:3200,
+    lensMinN:1.8, lensMaxN:11, hasND:false,
+    cleanNote:'usable to about ISO 3200' }
+};
+
+// --- Scenarios per mode ---
+const SCEN={
+  photo:[
+    {k:'night',    n:'Night / Low Light', i:'🌃', def_ev:5,  wb:'3500K'},
+    {k:'longexp',  n:'Long Exposure',     i:'🌌', def_ev:4,  wb:'3800K'},
+    {k:'daylight', n:'Daylight',          i:'☀️', def_ev:14, wb:'5600K'},
+  ],
+  video:[
+    {k:'day',    n:'Day Footage', i:'🎬', fps:24, def_ev:14, wb:'5600K'},
+    {k:'night',  n:'Night',       i:'🌙', fps:24, def_ev:5,  wb:'3500K'},
+    {k:'indoor', n:'Indoor',      i:'🏠', fps:24, def_ev:8,  wb:'3200K'},
+  ]
+};
+const FPSOPTS=[{f:24,e:'cine'},{f:25,e:'PAL'},{f:30,e:'NTSC'},{f:60,e:'slow-mo'},{f:120,e:'super-slo'}];
+
+// --- Stop ladders for snapping ---
+const APERT=[1.4,1.6,1.8,2,2.2,2.5,2.8,3.2,3.5,4,4.5,5,5.6,6.3,7.1,8,9,10,11,13,14,16,18,20,22];
+const ISOS=[100,125,160,200,250,320,400,500,640,800,1000,1250,1600,2000,2500,3200,4000,5000,6400,8000,10000,12800,16000,20000,25600,32000,40000,51200,64000,80000,102400];
+const NDS=[{x:'ND2',s:1},{x:'ND4',s:2},{x:'ND8',s:3},{x:'ND16',s:4},{x:'ND32',s:5},{x:'ND64',s:6},{x:'ND400',s:8.6},{x:'ND1000',s:10}];
+function snap(v,arr){return arr.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a);}
+function snapND(stops){ if(stops<0.5) return null; let best=NDS[0]; for(const x of NDS) if(Math.abs(x.s-stops)<Math.abs(best.s-stops)) best=x; return {x:best.x,s:best.s}; }
+function fmtShutter(t){ if(!isFinite(t)||t<=0) return '—'; if(t>=1) return (t<10?t.toFixed(1):Math.round(t))+'s'; return '1/'+Math.round(1/t); }
+function fmtAp(n){ return 'f/'+(n<10?n.toFixed(1):Math.round(n)); }
+
+// --- Advisor state ---
+let advCam=null, advMode='photo', advIntent='shoot', advScene=SCEN.photo[0], advFps=24, advExif=null, advStats=null;
+let liveStream=null, liveRAF=null, liveStats=null, liveCv=null, liveTick=0, advLookOn=true;
+
+// --- Camera model switching ---
+function stopCamera(){
+  running=false;
+  if(video.srcObject){ try{video.srcObject.getTracks().forEach(t=>t.stop());}catch(e){} video.srcObject=null; }
+  video.style.display='none';
+}
+function setModel(v){
+  stopMatchLive();
+  if(v==='sx70'){
+    document.getElementById('advisor').style.display='none';
+    document.getElementById('sx70App').style.display='block';
+    return;
+  }
+  stopCamera(); pvMode=false;
+  document.getElementById('sx70App').style.display='none';
+  document.getElementById('advisor').style.display='block';
+  advCam=v; advExif=null; advStats=null;
+  const p=PROFILES[v];
+  document.getElementById('advCamName').textContent=p.name;
+  document.getElementById('advCamSub').textContent=
+    p.sensor+' · '+(p.hasLog?p.logName+(p.altLog?' / '+p.altLog:''):'no Log — '+p.logName+' profile');
+  // reset upload UI
+  const img=document.getElementById('upImg');
+  img.style.display='none'; img.removeAttribute('src');
+  document.getElementById('dropInner').style.display='flex';
+  document.getElementById('dropZone').classList.remove('has');
+  document.getElementById('exifRow').style.display='none';
+  document.getElementById('advHistCard').style.display='none';
+  document.getElementById('photoInput').value='';
+  advIntent='shoot';
+  document.getElementById('tabShoot').classList.add('on');
+  document.getElementById('tabMatch').classList.remove('on');
+  renderGloss(v);
+  renderHowto(v);
+  setAdvMode('photo');
+}
+
+function applyAdvVis(){
+  const shoot=advIntent==='shoot';
+  document.getElementById('modeTabs').style.display=shoot?'flex':'none';
+  document.getElementById('scenRow').style.display=shoot?'flex':'none';
+  document.getElementById('fpsWrap').style.display=(shoot&&advMode==='video')?'flex':'none';
+  document.getElementById('dropSub').textContent=shoot
+    ? 'Upload your shot to grade its exposure — I read the EXIF + histogram'
+    : 'Upload a photo whose look you want — I estimate the in-camera settings to get a base for it';
+}
+function setIntent(i){
+  advIntent=i;
+  if(i!=='match') stopMatchLive();
+  document.getElementById('tabShoot').classList.toggle('on',i==='shoot');
+  document.getElementById('tabMatch').classList.toggle('on',i==='match');
+  applyAdvVis();
+  updateAdvisor();
+}
+
+function setAdvMode(m){
+  advMode=m;
+  document.getElementById('tabPhoto').classList.toggle('on',m==='photo');
+  document.getElementById('tabVideo').classList.toggle('on',m==='video');
+  advScene=SCEN[m][0];
+  if(m==='video') advFps=advScene.fps||24;
+  buildScenChips(); buildFpsChips(); applyAdvVis();
+  updateAdvisor();
+}
+function buildScenChips(){
+  const row=document.getElementById('scenRow'); row.innerHTML='';
+  SCEN[advMode].forEach((s,i)=>{
+    const c=document.createElement('div');
+    c.className='chip'+(s.k===advScene.k?' on':'');
+    c.innerHTML=s.i+' '+s.n;
+    c.onclick=()=>pickScenario(i);
+    row.appendChild(c);
+  });
+}
+function pickScenario(i){
+  advScene=SCEN[advMode][i];
+  if(advMode==='video') advFps=advScene.fps||advFps;
+  buildScenChips(); buildFpsChips(); updateAdvisor();
+}
+function buildFpsChips(){
+  const row=document.getElementById('fpsWrap');
+  if(advMode!=='video'){ row.innerHTML=''; return; }
+  row.innerHTML='';
+  FPSOPTS.forEach(o=>{
+    const c=document.createElement('div');
+    c.className='chip'+(o.f===advFps?' on':'');
+    c.innerHTML=o.f+'p<span class="ce">'+o.e+'</span>';
+    c.onclick=()=>{ advFps=o.f; buildFpsChips(); updateAdvisor(); };
+    row.appendChild(c);
+  });
+}
+
+// --- Photo upload handling ---
+function handlePhoto(input){
+  const file=input.files&&input.files[0]; if(!file) return;
+  const url=URL.createObjectURL(file);
+  const img=document.getElementById('upImg');
+  img.onload=()=>{
+    advStats=analyzeUpload(img);
+    renderExifAndHist(); updateAdvisor();
+    URL.revokeObjectURL(url);
+  };
+  img.src=url; img.style.display='block';
+  document.getElementById('dropInner').style.display='none';
+  document.getElementById('dropZone').classList.add('has');
+  const fr=new FileReader();
+  fr.onload=()=>{ advExif=parseExif(fr.result)||{}; computeExifEV(); renderExifAndHist(); updateAdvisor(); };
+  fr.onerror=()=>{ advExif={}; renderExifAndHist(); updateAdvisor(); };
+  fr.readAsArrayBuffer(file);
+}
+function pixelStats(d){
+  const hist=new Array(256).fill(0); let sum=0,n=0,sh=0,hi=0,sr=0,sg=0,sb=0,ssat=0;
+  for(let i=0;i<d.length;i+=4){
+    const R=d[i],G=d[i+1],B=d[i+2];
+    const l=Math.round(.2126*R+.7152*G+.0722*B);
+    hist[l]++; sum+=l; n++; sr+=R; sg+=G; sb+=B;
+    if(l<=6) sh++; if(l>=249) hi++;
+    const mx=Math.max(R,G,B),mn=Math.min(R,G,B);
+    ssat+=mx>0?(mx-mn)/mx:0;
+  }
+  n=Math.max(1,n);
+  const pct=q=>{let t=q*n,c2=0;for(let k=0;k<256;k++){c2+=hist[k];if(c2>=t)return k;}return 255;};
+  return {hist,mean:sum/n,shadowPct:100*sh/n,highPct:100*hi/n,
+    meanR:sr/n,meanG:sg/n,meanB:sb/n,sat:ssat/n,p5:pct(.05),p50:pct(.5),p95:pct(.95)};
+}
+function analyzeUpload(img){
+  const cv=document.createElement('canvas');
+  const scale=Math.min(1,480/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+  cv.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+  cv.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+  const c=cv.getContext('2d');
+  c.drawImage(img,0,0,cv.width,cv.height);
+  return pixelStats(c.getImageData(0,0,cv.width,cv.height).data);
+}
+function computeExifEV(){
+  if(!advExif) return;
+  const f=advExif.fnum,t=advExif.exp,iso=advExif.iso;
+  if(f>0&&t>0&&iso>0) advExif.ev100=Math.log2(f*f/t)-Math.log2(iso/100);
+}
+
+// --- Minimal EXIF (JPEG APP1 / TIFF) reader ---
+function parseExif(buf){
+ try{
+  const dv=new DataView(buf), len=dv.byteLength;
+  if(dv.getUint16(0)!==0xFFD8) return {};
+  let off=2, app1=-1;
+  while(off+4<=len){
+    const marker=dv.getUint16(off);
+    if(marker===0xFFD9||marker===0xFFDA) break;
+    if((marker&0xFF00)!==0xFF00){ off++; continue; }
+    const size=dv.getUint16(off+2);
+    if(marker===0xFFE1 && dv.getUint32(off+4)===0x45786966){ app1=off+4; break; }
+    off+=2+size;
+  }
+  if(app1<0) return {};
+  const tiff=app1+6;
+  const le=dv.getUint16(tiff)===0x4949;
+  const r16=o=>dv.getUint16(o,le), r32=o=>dv.getUint32(o,le), rs32=o=>dv.getInt32(o,le);
+  function readIFD(o){
+    const out={}; if(o<0||o+2>len) return out;
+    const n=r16(o);
+    for(let i=0;i<n;i++){
+      const e=o+2+i*12; if(e+12>len) break;
+      const tag=r16(e),type=r16(e+2),cnt=r32(e+4);
+      const ts={1:1,2:1,3:2,4:4,5:8,7:1,9:4,10:8}[type]||1;
+      let vo=e+8; if(ts*cnt>4) vo=tiff+r32(e+8);
+      out[tag]={type,cnt,vo};
+    }
+    return out;
+  }
+  function v(en){
+    if(!en) return null; const{type,cnt,vo}=en;
+    if(vo<0||vo>=len) return null;
+    if(type===2){ let s=''; for(let i=0;i<cnt&&vo+i<len;i++){const c=dv.getUint8(vo+i); if(c===0)break; s+=String.fromCharCode(c);} return s.trim(); }
+    if(type===3) return r16(vo);
+    if(type===4) return r32(vo);
+    if(type===5){ const den=r32(vo+4); return den?r32(vo)/den:0; }
+    if(type===10){ const den=rs32(vo+4); return den?rs32(vo)/den:0; }
+    if(type===9) return rs32(vo);
+    if(type===1||type===7) return dv.getUint8(vo);
+    return null;
+  }
+  const ifd0=readIFD(tiff+r32(tiff+4));
+  const res={make:v(ifd0[0x010F]),model:v(ifd0[0x0110])};
+  const ptr=ifd0[0x8769]?v(ifd0[0x8769]):null;
+  if(ptr){
+    const ex=readIFD(tiff+ptr);
+    res.exp=v(ex[0x829A]); res.fnum=v(ex[0x829D]); res.iso=v(ex[0x8827]);
+    res.bias=v(ex[0x9204]); res.focal=v(ex[0x920A]); res.wb=v(ex[0xA403]); res.date=v(ex[0x9003]);
+  }
+  return res;
+ }catch(e){ return {}; }
+}
+
+// --- Render EXIF chips + histogram ---
+function renderExifAndHist(){
+  const e=advExif||{}, chips=[];
+  if(e.model){ const mk=(e.make&&e.model.toUpperCase().indexOf(e.make.toUpperCase())<0)?e.make+' ':''; chips.push('<span class="exif-chip"><b>'+mk+e.model+'</b></span>'); }
+  if(e.iso)   chips.push('<span class="exif-chip">ISO <b>'+e.iso+'</b></span>');
+  if(e.exp)   chips.push('<span class="exif-chip"><b>'+fmtShutter(e.exp)+'</b></span>');
+  if(e.fnum)  chips.push('<span class="exif-chip"><b>'+fmtAp(e.fnum)+'</b></span>');
+  if(e.focal) chips.push('<span class="exif-chip"><b>'+Math.round(e.focal)+'mm</b></span>');
+  if(e.bias!=null&&Math.abs(e.bias)>0.01) chips.push('<span class="exif-chip">exp comp <b>'+(e.bias>0?'+':'')+e.bias.toFixed(1)+'</b></span>');
+  if(e.ev100!=null) chips.push('<span class="exif-chip">scene <b>EV '+e.ev100.toFixed(1)+'</b></span>');
+  if(!e.iso&&!e.exp&&!e.fnum) chips.push('<span class="exif-chip warn">⚠ no EXIF — using scene brightness only</span>');
+  const row=document.getElementById('exifRow');
+  row.innerHTML=chips.join(''); row.style.display=chips.length?'flex':'none';
+  if(advStats){
+    document.getElementById('advHistCard').style.display='block';
+    drawHistOn(document.getElementById('advHist'),advStats.hist);
+    const s=advStats, parts=['avg '+Math.round(s.mean)+'/255'];
+    if(s.highPct>1) parts.push('<span style="color:#ef4444">'+s.highPct.toFixed(1)+'% highlights clipped</span>');
+    if(s.shadowPct>10) parts.push('<span style="color:#6366f1">'+s.shadowPct.toFixed(0)+'% deep shadow</span>');
+    document.getElementById('advScene').innerHTML=parts.join(' · ');
+  }
+}
+function drawHistOn(cv,hist){
+  const w=cv.offsetWidth||320,h=42; cv.width=w; cv.height=h;
+  const cx=cv.getContext('2d');
+  let max=1; for(let i=4;i<252;i++) max=Math.max(max,hist[i]);
+  cx.clearRect(0,0,w,h);
+  cx.fillStyle='#0c1428';cx.fillRect(0,0,w*.25,h);
+  cx.fillStyle='#0a1a10';cx.fillRect(w*.25,0,w*.5,h);
+  cx.fillStyle='#1c0a0a';cx.fillRect(w*.75,0,w*.25,h);
+  const bw=w/256;
+  for(let i=0;i<256;i++){
+    const bh=(hist[i]/max)*h*.92,tn=i/255;
+    cx.fillStyle='rgba('+Math.round(tn*200+55)+','+Math.round(Math.max(0,180-Math.abs(i-128)*1.2))+','+Math.round((1-tn)*200+55)+',.85)';
+    cx.fillRect(i*bw,h-bh,bw+.5,bh);
+  }
+}
+
+// --- Recommendation engine ---
+function updateAdvisor(){
+  if(!advCam) return;
+  const p=PROFILES[advCam];
+  if(advIntent==='match'){ renderMatch(p); return; }
+  const fromExif=!!(advExif&&advExif.ev100!=null);
+  const ev100=fromExif?advExif.ev100:advScene.def_ev;
+  const scene={k:advScene.k,wb:advScene.wb,fps:advFps,ev100};
+  const r=(advMode==='video')?recoVideo(p,scene):recoPhoto(p,scene);
+  r.fromExif=fromExif;
+  renderReco(p,r);
+}
+
+function recoVideo(p,scene){
+  const fps=scene.fps||24;
+  const t=1/Math.round(2*fps);                 // 180° shutter
+  const ettr=p.hasLog?p.ettr:0.2;
+  const targetEV=scene.ev100-ettr;             // expose to the right
+  const floor=p.logFloorISO;
+  let iso=floor, aperture, nd=null, isoNote='native base', apNote='', tips=[];
+  const Nfloor=Math.sqrt(t*(floor/100)*Math.pow(2,targetEV));
+  if(Nfloor>p.lensMaxN){
+    // too bright at base ISO → ND
+    let work=Math.min(5.6,p.lensMaxN);
+    const stops=2*Math.log2(Nfloor/work);
+    if(p.hasND){ nd=snapND(stops); aperture=work; apNote='for sharpness'; }
+    else{
+      aperture=p.lensMaxN; apNote='stopped down';
+      const resid=2*Math.log2(Nfloor/p.lensMaxN);
+      if(resid>0.3) tips.push('The G7 X has <b>no ND slot</b>. At '+fmtAp(p.lensMaxN)+' it\'s still ~'+resid.toFixed(1)+' stops too bright for a 180° shutter — shoot in shade, add a clip-on/adapter ND, or accept a faster shutter (slightly crisper, less natural motion blur).');
+    }
+  } else if(Nfloor<p.lensMinN){
+    // too dark wide-open → raise ISO
+    aperture=p.lensMinN; apNote='wide open';
+    let need=100*p.lensMinN*p.lensMinN/(t*Math.pow(2,targetEV));
+    if(need>p.isoLogMax){ iso=p.isoLogMax; isoNote='max usable';
+      tips.push('Even wide-open at '+fmtAp(p.lensMinN)+' / ISO '+p.isoLogMax+' this scene is dark — add light or drop to a slower frame rate. The '+p.name+' is '+p.cleanNote+', so this ISO is still very usable.');
+    } else { iso=need; isoNote='raised for low light'; }
+  } else {
+    aperture=Nfloor; apNote='';
+  }
+  iso=snap(iso,ISOS); aperture=snap(aperture,APERT);
+  const profileShort=p.hasLog?p.logName:'Neutral −4';
+  const expLine=p.hasLog
+    ? 'Expose to the <b>right</b> for clean shadows: aim middle-grey near <b>'+(p.greyIRE+Math.round(ettr*8))+'% IRE</b> (≈ +'+ettr+' stop over the '+p.logName+' meter) and set <b>zebras to 94%</b> so highlights never clip. '+p.logName+' looks flat &amp; washed-out on screen — that\'s correct; contrast returns with your LUT / grade.'
+    : 'No true Log here. Use the <b>Neutral</b> Picture Style with Contrast −4, Sharpness −2 for the most latitude, and protect highlights — the 1″ sensor clips hard with little to recover.';
+  tips.push('Shutter is locked to <b>'+fmtShutter(t)+'</b> by the 180° rule at '+fps+'p — change exposure with <b>ISO, aperture and ND</b>, never the shutter.');
+  if(p.hasND&&scene.k==='day') tips.push('Daytime Log almost always needs ND. A <b>variable ND (2–5 stop)</b> lets you hold '+fmtAp(aperture)+' at base ISO as the light shifts.');
+  tips.push('Set white balance manually (~'+scene.wb+') — auto WB drifts shot-to-shot and is painful to match in the edit.');
+  return {mode:'video',iso,shutter:t,aperture,nd,profileShort,wb:scene.wb,expLine,tips,
+    isoNote,apNote,shutterNote:'180° · '+fps+'p',fps};
+}
+
+function recoPhoto(p,scene){
+  const k=scene.k, targetEV=scene.ev100;
+  let iso,t,aperture,tips=[],secLabel='Stabilize',secVal='Handheld',secSub='',isoNote='',apNote='';
+  if(k==='daylight'){
+    aperture=p.hasLog?8:5.6; iso=p.isoMin;
+    t=aperture*aperture/((iso/100)*Math.pow(2,targetEV));
+    isoNote='base · cleanest'; apNote='deep focus';
+    secLabel='Drive'; secVal='Single'; secSub='fast shutter';
+    tips.push('Bright scene — keep ISO at base ('+p.isoMin+') for the most dynamic range and the cleanest file.');
+  } else if(k==='longexp'){
+    aperture=p.hasLog?5.6:4; iso=p.isoMin;
+    t=aperture*aperture/((iso/100)*Math.pow(2,targetEV));
+    isoNote='base · clean'; apNote='sharpest';
+    secLabel='Support'; secVal='Tripod'; secSub='+ 2s timer';
+    tips.push('On a tripod, gather light with <b>time</b>, not ISO — base ISO '+p.isoMin+' keeps shadows noise-free for big night prints.');
+    tips.push('Trigger with a <b>2-second timer or remote</b> so pressing the shutter doesn\'t shake a long exposure.');
+  } else { // night / handheld low light
+    aperture=p.lensMinN;
+    const focal=(advExif&&advExif.focal)?advExif.focal:35;
+    t=Math.min(1/60,1/focal);
+    iso=aperture*aperture*100/(t*Math.pow(2,targetEV));
+    iso=Math.min(iso,p.isoMax);
+    isoNote=iso>=p.isoMax?'max':'pushed for light'; apNote='wide open';
+    secLabel='Hold'; secVal='Brace'; secSub='≥ '+fmtShutter(t);
+    tips.push('Handheld night: open to '+fmtAp(p.lensMinN)+' and let ISO climb — the '+p.name+' is '+p.cleanNote+'.');
+    tips.push('Keep shutter at <b>'+fmtShutter(t)+'</b> or faster to beat handshake; brace against something solid. For a sharper, lower-ISO frame, switch to <b>Long Exposure</b> on a tripod.');
+  }
+  iso=snap(iso,ISOS); aperture=snap(aperture,APERT);
+  const profileShort=p.hasLog?'RAW':'RAW';
+  const expLine=p.hasLog
+    ? 'Shoot <b>RAW</b> for stills — S-Log only changes the JPEG/preview, not the RAW data. Expose normally and grade the RAW, or apply '+p.logName+' and expose ETTR (~+'+p.ettr+' stop) if you want the flat look baked in.'
+    : 'Shoot RAW (or RAW+JPEG). The 1″ sensor has limited latitude, so nail exposure in-camera and protect highlights.';
+  tips.push('Lock white balance ~'+scene.wb+' for this light so a sequence of frames matches.');
+  return {mode:'photo',iso,shutter:t,aperture,nd:null,profileShort,wb:scene.wb,expLine,tips,
+    isoNote,apNote,secLabel,secVal,secSub};
+}
+
+// --- Verdict on the uploaded shot ---
+function verdictFor(p){
+  const s=advStats;
+  if(!s) return {cls:'good',title:'Choose your scene & mode',
+    desc:'The settings below are tuned for the selected scenario. <b>Upload a camera-roll photo</b> to read its real settings and get a tailored exposure verdict + histogram.'};
+  if(s.highPct>2) return {cls:'very-bright',title:'Highlights are clipping',
+    desc:p.hasLog
+      ? s.highPct.toFixed(1)+'% of the frame is blown to pure white — unrecoverable even in '+p.logName+'. Add ND, stop down, or lower ISO until the brights fall back under 100%. In Log keep your peak highlight ~90–95% (zebras at 94).'
+      : s.highPct.toFixed(1)+'% blown out. The 1″ sensor can\'t recover clipped highlights — lower ISO, faster shutter, or expose for the bright areas.'};
+  if(s.mean<55&&s.shadowPct>30) return {cls:'dark',title:'Underexposed — shadows blocked up',
+    desc:p.hasLog
+      ? 'Shadows are crushed ('+s.shadowPct.toFixed(0)+'% near-black) — exactly where '+p.logName+' noise lives. Expose to the RIGHT: open up, slow the shutter, or raise ISO so middle-grey sits brighter. Remember Log <b>looks</b> dark &amp; flat by design — judge it on the histogram, not the preview.'
+      : 'Image is dark. Open the aperture, slow the shutter (within the 180° limit for video), or raise ISO.'};
+  if(p.hasLog&&s.mean>150) return {cls:'bright',title:'Bright — good for Log, watch the top',
+    desc:'Healthy ETTR exposure for '+p.logName+'. Just confirm no important highlight is pinned at 100% — pull back a hair if zebras flash on skies or skin.'};
+  return {cls:'good',title:'Exposure looks usable',
+    desc:p.hasLog
+      ? 'Nothing clipping hard. For the cleanest '+p.logName+', aim a touch brighter (ETTR ~+'+p.ettr+' stop) than a "normal" exposure, then bring it down in the grade.'
+      : 'Balanced exposure — fine-tune with the settings below.'};
+}
+
+// --- Render the recommendation card ---
+function cell(l,val,sub,hl){
+  return '<div class="set-cell'+(hl?' hl':'')+'"><div class="sc-l">'+l+'</div><div class="sc-v">'+val+'</div><div class="sc-s">'+(sub||'')+'</div></div>';
+}
+function renderReco(p,r){
+  const v=verdictFor(p), col=ZC[v.cls][0], bg=ZC[v.cls][1];
+  let h='<div class="reco-verdict" style="border-color:'+col+';background:'+bg+'88">'
+       +'<div class="rv-t" style="color:'+col+'">'+v.title+'</div>'
+       +'<div class="rv-d">'+v.desc+'</div></div>';
+  if(!r.fromExif) h+='<div class="reco-est">Estimated for a typical <b>'+advScene.n+'</b> scene — upload a photo to dial these in to your exact light.</div>';
+  const cells=[];
+  cells.push(cell('ISO',r.iso,r.isoNote,true));
+  cells.push(cell('Shutter',fmtShutter(r.shutter),r.shutterNote||'',true));
+  cells.push(cell('Aperture',fmtAp(r.aperture),r.apNote,true));
+  cells.push(cell('Profile',r.profileShort,p.hasLog?'flat · editable':'flat colour'));
+  if(r.mode==='video') cells.push(cell('ND Filter',r.nd?r.nd.x:'none',r.nd?'−'+r.nd.s+' stops':'not needed',!!r.nd));
+  else                 cells.push(cell(r.secLabel,r.secVal,r.secSub));
+  cells.push(cell('White Bal.',r.wb,'set by hand'));
+  h+='<div class="sec-h">Recommended settings</div>';
+  h+='<div class="set-grid">'+cells.join('')+'</div>';
+  h+='<div class="sec-h">Do this now — '+(r.mode==='video'?'on the camera':'handheld')+'</div>';
+  h+=doNowHTML(buildDoNow(p,r,advCam));
+  h+='<div class="sec-h">Exposure &amp; profile</div>';
+  h+='<div class="tip">'+r.expLine+'</div>';
+  h+='<div class="sec-h">Notes</div>';
+  h+='<ul class="reco-tips">'+r.tips.map(t=>'<li>'+t+'</li>').join('')+'</ul>';
+  document.getElementById('recoBody').innerHTML=h;
+  document.getElementById('recoCard').style.display='block';
+  setZC(v.cls);
+}
+
+// --- "Match a look": reverse-engineer settings from a reference image ---
+function recoMatch(p){
+  const s=advStats, e=advExif||{};
+  // exposure key
+  const mean=s.mean;
+  let keyVal,keyNote,cls;
+  if(mean<70){ keyVal='Low-key'; keyNote='dark / moody'; cls='dark'; }
+  else if(mean>155){ keyVal='High-key'; keyNote='bright / airy'; cls='bright'; }
+  else{ keyVal='Balanced'; keyNote='mid exposure'; cls='good'; }
+  // white balance from colour cast
+  const rb=s.meanR/Math.max(1,s.meanB);
+  let kelvin,wbWord;
+  if(rb>1.28){ kelvin='3200K'; wbWord='very warm'; }
+  else if(rb>1.12){ kelvin='4200K'; wbWord='warm'; }
+  else if(rb>0.95){ kelvin='5600K'; wbWord='neutral'; }
+  else if(rb>0.85){ kelvin='6800K'; wbWord='cool'; }
+  else{ kelvin='8000K'; wbWord='very cool'; }
+  const gr=s.meanG/Math.max(1,(s.meanR+s.meanB)/2);
+  const tint = gr>1.06?'+green' : (gr<0.94?'+magenta':'');
+  // contrast / blacks
+  const range=s.p95-s.p5;
+  const lifted=s.p5>40;
+  let conVal,conNote;
+  if(range>205&&s.p5<14){ conVal='High'; conNote='deep blacks'; }
+  else if(range<95||lifted){ conVal='Low / flat'; conNote=lifted?'lifted blacks':'soft'; }
+  else{ conVal='Medium'; conNote='natural'; }
+  // saturation
+  let satVal;
+  if(s.sat<0.12) satVal='Muted'; else if(s.sat>0.34) satVal='Vivid'; else satVal='Natural';
+  // ISO / aperture (use EXIF when present)
+  const isoCell = e.iso ? ['ISO',e.iso,'from photo',false]
+                        : ['ISO',(mean<70?'higher':'base'),(mean<70?'low light':'clean'),false];
+  const apCell  = e.fnum ? ['Aperture',fmtAp(e.fnum),'from photo',false]
+                         : ['Aperture','by eye','match the blur',false];
+  const cells=[
+    ['Exposure',keyVal,keyNote,true],
+    ['White Bal.',kelvin+(tint?' '+tint:''),wbWord,true],
+    ['Contrast',conVal,conNote,false],
+    ['Saturation',satVal,'creative style',false],
+    isoCell, apCell
+  ];
+  const title='Look: '+wbWord+', '+keyVal.toLowerCase()+', '+conVal.toLowerCase().replace(' / flat','')+' contrast';
+  const desc='Estimated from the reference\'s brightness, colour cast and contrast. The exact tone is a <b>colour grade</b>, not an in-camera setting — these get you a clean, gradeable base, not a pixel match.';
+  const expLine = p.hasLog
+    ? 'Capture flat to keep latitude: <b>RAW</b> for stills, <b>'+p.logName+'</b> for video. Lock the <b>white balance (~'+kelvin+')</b> and the exposure key in-camera; do colour &amp; contrast in the grade.'
+    : 'Shoot RAW / the <b>Neutral</b> profile so colour and contrast stay gradeable. Set white balance ~'+kelvin+' and the exposure key in-camera; grade the rest.';
+  const tips=[];
+  tips.push('White balance is the biggest piece of a look you can truly <b>dial in-camera</b> — start at <b>'+kelvin+(tint?' '+tint:'')+'</b> ('+wbWord+').');
+  if(conVal==='Low / flat'&&lifted) tips.push('That faded, <b>lifted-blacks</b> film look is a grade, not a capture setting — shoot flat ('+(p.hasLog?p.logName:'Neutral −4')+') and raise the black level + drop contrast in post.');
+  else if(conVal==='High') tips.push('Punchy contrast with deep blacks — fine to bake some in, but protect highlights so they don\'t clip past recovery.');
+  if(satVal==='Muted') tips.push('Desaturated look — pull saturation down in your creative style, or (better) in the grade for control over skin tones.');
+  if(satVal==='Vivid') tips.push('Saturated look — a Vivid/Deep style gets close; grading keeps skin natural while the rest pops.');
+  if(e.iso||e.exp||e.fnum) tips.push('This reference was shot at '+[e.iso?'ISO '+e.iso:'',e.exp?fmtShutter(e.exp):'',e.fnum?fmtAp(e.fnum):''].filter(Boolean).join(' · ')+' — a solid starting point to copy.');
+  else tips.push('No EXIF here, so aperture/shutter are judgment calls — match <b>depth of field</b> (blurry background → shoot wide, ~f/1.8–2.8) and motion blur by eye.');
+  const doNow=[
+    ['Set white balance to ~'+kelvin,'press <b>Fn → White Balance → C.Temp./Filter</b> — this is the single biggest part of the look you actually set on the camera'],
+    ['Turn on a flat profile', p.hasLog?('MENU → Picture Profile → '+(p.logName==='S-Log3'?'a slot → Gamma → <b>S-Log3</b>':'<b>PP7</b> (S-Log2)')+' so you can colour it later'):'Picture Style → <b>Neutral</b>, Contrast −4 so you can colour it later'],
+    ['Exposure: aim '+(keyVal==='Low-key'?'a little darker (moody)':keyVal==='High-key'?'a little brighter (airy)':'normal'),
+      keyVal==='Balanced'?'expose normally — not too bright or dark':'nudge the <b>exposure-comp dial '+(keyVal==='High-key'?'+1':'−1')+'</b>'],
+    ['The rest happens in editing','the '+conVal.toLowerCase().replace(' / flat',' / flat')+' contrast and '+satVal.toLowerCase()+' colour are done when you grade — capture flat now, match it in post']
+  ];
+  return {cls,title,desc,cells,expLine,tips,doNow};
+}
+function renderMatch(p){
+  const body=document.getElementById('recoBody');
+  document.getElementById('recoCard').style.display='block';
+  if(!advStats){
+    stopMatchLive();
+    body.innerHTML=
+      '<div class="reco-verdict" style="border-color:#6366f1;background:#1e1b4b88">'
+      +'<div class="rv-t" style="color:#818cf8">Match a look</div>'
+      +'<div class="rv-d"><b>Step 1:</b> upload the photo whose look you want (your <b>target</b>) — a film still, someone\'s shot, a frame you love.<br><b>Step 2:</b> tap <b>Live preview</b> — your camera feed gets tinted to roughly show that look, and I tell you what to change to match it. Colour grading itself is a post step, so this gets you close, not pixel-exact.</div></div>';
+    setZC('very-dark');
+    return;
+  }
+  if(liveStream){ renderMatchLiveUI(p); return; }
+  const m=recoMatch(p), col=ZC[m.cls][0], bg=ZC[m.cls][1];
+  let h='<div class="reco-verdict" style="border-color:'+col+';background:'+bg+'88">'
+       +'<div class="rv-t" style="color:'+col+'">'+m.title+'</div>'
+       +'<div class="rv-d">'+m.desc+'</div></div>';
+  h+='<button class="adv-live-btn" id="liveBtn" onclick="toggleMatchLive()">▶ Live preview — point your camera, I\'ll tell you what to change</button>';
+  h+='<div class="sec-h">Do this to get the look</div>';
+  h+=doNowHTML(m.doNow);
+  h+='<div class="sec-h">Closest in-camera settings</div>';
+  h+='<div class="set-grid">'+m.cells.map(c=>cell(c[0],c[1],c[2],c[3])).join('')+'</div>';
+  h+='<div class="sec-h">Capture for grading</div>';
+  h+='<div class="tip">'+m.expLine+'</div>';
+  h+='<div class="sec-h">Notes</div>';
+  h+='<ul class="reco-tips">'+m.tips.map(t=>'<li>'+t+'</li>').join('')+'</ul>';
+  body.innerHTML=h;
+  setZC(m.cls);
+}
+
+/* ===== Live preview: phone camera as 'current', grounded in the device ===== */
+function toggleMatchLive(){ if(liveStream) stopMatchLive(); else startMatchLive(); }
+function startMatchLive(){
+  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+    alert('Live preview needs HTTPS.\n\nOpen the https:// URL from your Mac (python3 server.py) so the browser will allow the camera.');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}}).then(stream=>{
+    liveStream=stream;
+    const vid=document.getElementById('advVideo');
+    vid.srcObject=stream;
+    document.getElementById('liveWrap').style.display='block';
+    vid.onloadedmetadata=()=>{ liveTick=0; if(liveRAF) cancelAnimationFrame(liveRAF); matchLoop(); applyLook(); };
+    renderMatchLiveUI(PROFILES[advCam]);
+    applyLook();
+  }).catch(()=>{
+    alert('Camera access denied.\n\n'+(isIphone?'iPhone: Settings → Safari → Camera → Allow':'Allow camera in your browser, then try again.'));
+  });
+}
+function stopMatchLive(){
+  if(liveRAF){ cancelAnimationFrame(liveRAF); liveRAF=null; }
+  if(liveStream){ try{liveStream.getTracks().forEach(t=>t.stop());}catch(e){} liveStream=null; }
+  liveStats=null;
+  const vid=document.getElementById('advVideo'); if(vid){ vid.srcObject=null; vid.style.filter=''; }
+  const ov=document.getElementById('lookOverlay'); if(ov) ov.style.background='transparent';
+  const bd=document.getElementById('lookBadge'); if(bd) bd.style.display='none';
+  const w=document.getElementById('liveWrap'); if(w) w.style.display='none';
+}
+function matchLoop(){
+  if(!liveStream) return;
+  const vid=document.getElementById('advVideo');
+  if(vid&&vid.videoWidth&&(liveTick++ %5===0)){
+    if(!liveCv) liveCv=document.createElement('canvas');
+    const w=160,h=Math.max(1,Math.round(160*vid.videoHeight/vid.videoWidth));
+    liveCv.width=w; liveCv.height=h;
+    const c=liveCv.getContext('2d'); c.drawImage(vid,0,0,w,h);
+    liveStats=pixelStats(c.getImageData(0,0,w,h).data);
+    const dp=document.getElementById('deltaPanel');
+    if(dp) dp.innerHTML=renderLivePanel(PROFILES[advCam],advStats,liveStats,liveSensor());
+  }
+  liveRAF=requestAnimationFrame(matchLoop);
+}
+function renderMatchLiveUI(p){
+  let h='<div class="reco-verdict" style="border-color:#10b981;background:#022c2288">'
+       +'<div class="rv-t" style="color:#34d399">Live match — adjust toward the target</div>'
+       +'<div class="rv-d">The live feed above is <b>tinted to roughly preview the target look</b> (approximate — it\'s a rough filter, not the real grade). Change settings until the rows below read <b>matched</b>. Your phone\'s sensor isn\'t your '+p.name+', so treat these as <b>directions</b>; where your phone reports real sensor data I translate it into actual '+p.name+' settings.</div></div>';
+  h+='<button class="look-btn'+(advLookOn?'':' off')+'" id="lookBtn" onclick="toggleLook()">'
+    +(advLookOn?'👁 Look preview: ON — feed tinted toward the target':'👁 Look preview: OFF — raw feed')+'</button>';
+  h+='<div class="sec-h">Move current → target</div>';
+  h+='<div id="deltaPanel">'+(liveStats?renderLivePanel(p,advStats,liveStats,liveSensor())
+        :'<div class="d-read">starting camera…</div>')+'</div>';
+  h+='<button class="adv-live-btn on" id="liveBtn" onclick="toggleMatchLive()">■ Stop live preview</button>';
+  document.getElementById('recoBody').innerHTML=h;
+  document.getElementById('recoCard').style.display='block';
+  applyLook();
+  setZC('good');
+}
+// Read the phone's real sensor data when the OS exposes it (mostly Android; iOS hides it)
+function liveSensor(){
+  const out={ok:false,device:deviceLabel,ap:deviceAperture};
+  if(!liveStream) return out;
+  try{
+    const s=liveStream.getVideoTracks()[0].getSettings();
+    if(s.exposureTime>0&&s.iso>0){
+      out.ev100=Math.max(2,Math.min(18,Math.log2((deviceAperture*deviceAperture)/s.exposureTime)-Math.log2(s.iso/100)));
+      out.ok=true;
+    }
+    if(s.colorTemperature>0) out.colorTemp=s.colorTemperature;
+  }catch(e){}
+  return out;
+}
+// Translate a phone-measured scene EV into real settings for the selected camera
+function liveSony(p,ev100,keyStops){
+  const target=ev100-keyStops;               // brighter target look → expose more
+  if(ev100<9){                               // low light: open up, lift ISO at 1/60
+    const ap=p.lensMinN, t=1/60;
+    let iso=100*ap*ap/(t*Math.pow(2,target));
+    iso=snap(Math.min(p.isoMax,Math.max(p.logFloorISO,iso)),ISOS);
+    return {iso,t,ap:snap(ap,APERT)};
+  }
+  const ap=4, iso=p.logFloorISO;             // brighter: base ISO, mid aperture, solve shutter
+  let t=ap*ap/((iso/100)*Math.pow(2,target));
+  return {iso:snap(iso,ISOS),t,ap:snap(ap,APERT)};
+}
+function drow(label,arrow,detail,tag,matched){
+  return '<div class="d-row'+(matched?' dmatch':'')+'">'
+    +'<span class="d-l">'+label+'</span>'
+    +'<span class="d-mid">'+(matched?'✓ matched':arrow+' '+detail)+'</span>'
+    +'<span class="d-tag">'+tag+'</span></div>';
+}
+function renderLivePanel(p,t,c,sensor){
+  let h='<div class="d-read">📱 <b>'+(sensor.device||deviceLabel)+'</b> · '
+    +(sensor.ok?('scene <b>EV '+sensor.ev100.toFixed(1)+'</b>'+(sensor.colorTemp?' · '+Math.round(sensor.colorTemp)+'K':'')+' · live sensor')
+                :'brightness estimate — this device hides its sensor data, so exposure is relative')+'</div>';
+  // White balance (target colour bias vs your auto-WB'd frame)
+  const tRB=t.meanR/Math.max(1,t.meanB), cRB=c.meanR/Math.max(1,c.meanB), dRB=tRB-cRB, aRB=Math.abs(dRB);
+  if(aRB<0.05) h+=drow('White balance','','','in-camera',true);
+  else{ const warm=dRB>0, k=aRB>0.35?'2500K':aRB>0.15?'1200K':'500K';
+    h+=drow('White balance',warm?'🔥':'❄️',(warm?'warmer +':'cooler −')+k,'in-camera',false); }
+  // Exposure key (how far the target sits from a neutral exposure)
+  const dEV=Math.log2(Math.max(1,t.mean)/Math.max(1,c.mean)), aEV=Math.abs(dEV);
+  if(aEV<0.2) h+=drow('Exposure','','','in-camera',true);
+  else h+=drow('Exposure',dEV>0?'↑':'↓',(dEV>0?'brighter +':'darker −')+Math.min(3,aEV).toFixed(1)+' stop','in-camera',false);
+  // Contrast
+  const dC=(t.p95-t.p5)-(c.p95-c.p5), aC=Math.abs(dC);
+  if(aC<22) h+=drow('Contrast','','','grade',true);
+  else h+=drow('Contrast',dC>0?'↑':'↓',dC>0?'more contrast':'softer / flatter','grade',false);
+  // Saturation
+  const dS=t.sat-c.sat, aS=Math.abs(dS);
+  if(aS<0.05) h+=drow('Saturation','','','grade',true);
+  else h+=drow('Saturation',dS>0?'↑':'↓',dS>0?'more saturated':'less saturated','grade',false);
+  // Device-grounded translation to the real camera
+  if(sensor.ok){
+    const keyStops=Math.log2(Math.max(8,t.mean)/128);
+    const r=liveSony(p,sensor.ev100,keyStops);
+    h+='<div class="d-sony"><span class="d-sony-l">On your '+p.name+' now</span>'
+      +'<span class="d-sony-v">ISO '+r.iso+' · '+fmtShutter(r.t)+' · '+fmtAp(r.ap)+'</span></div>';
+  }
+  return h;
+}
+// Tint the live feed to roughly show the target look ("what it should be")
+function computeLookFilters(t){
+  const br=Math.max(0.55,Math.min(1.7,t.mean/118));
+  const ct=Math.max(0.7,Math.min(1.6,(t.p95-t.p5)/175));
+  const sa=Math.max(0.35,Math.min(1.8,t.sat/0.30));
+  const rb=t.meanR/Math.max(1,t.meanB);
+  let ov='transparent';
+  if(rb>1.18) ov='rgba(255,140,30,0.55)';
+  else if(rb>1.06) ov='rgba(255,170,80,0.32)';
+  else if(rb<0.85) ov='rgba(60,140,255,0.50)';
+  else if(rb<0.95) ov='rgba(110,170,255,0.30)';
+  return {filter:'brightness('+br.toFixed(2)+') contrast('+ct.toFixed(2)+') saturate('+sa.toFixed(2)+')',overlay:ov};
+}
+function applyLook(){
+  const vid=document.getElementById('advVideo'), ov=document.getElementById('lookOverlay'), bd=document.getElementById('lookBadge');
+  if(!vid||!ov||!bd) return;
+  if(advLookOn&&advStats&&liveStream){ const f=computeLookFilters(advStats);
+    vid.style.filter=f.filter; ov.style.background=f.overlay; bd.style.display='block'; }
+  else { vid.style.filter=''; ov.style.background='transparent'; bd.style.display='none'; }
+}
+function toggleLook(){
+  advLookOn=!advLookOn; applyLook();
+  const b=document.getElementById('lookBtn');
+  if(b){ b.classList.toggle('off',!advLookOn);
+    b.textContent=advLookOn?'👁 Look preview: ON — feed tinted toward the target':'👁 Look preview: OFF — raw feed'; }
+}
+
+/* ===== "How to set it" — per-camera menu / button steps ===== */
+const HOWTO={
+  a7s2:[
+    {ic:'🔆',t:'ISO',path:'Wheel ► (right)  ·  or Fn → ISO',steps:[
+      'Press the <b>right side of the control wheel</b> (the ISO shortcut), or press <b>Fn</b> and pick the <b>ISO</b> tile.',
+      'Turn the wheel or press <b>up / down</b> to choose a value, then press <b>center</b> to confirm.',
+      'Menu route: <b>MENU → Camera 1 → ISO</b>.'],
+      note:'In any S-Log Picture Profile the ISO won\'t drop below 1600 — that floor is normal, not a fault.'},
+    {ic:'⏱️',t:'Shutter speed',path:'Mode dial M or S  ·  rear dial',steps:[
+      'Set the top <b>mode dial</b> to <b>M</b> (manual) or <b>S</b> (shutter-priority).',
+      'Turn the <b>rear dial</b> to change shutter speed (factory default).',
+      'For 24p video use <b>1/48 or 1/50</b> — the 180° rule.'],
+      note:'If the wrong dial moves it, swap front/rear in MENU → gear (Custom) → Dial Setup.'},
+    {ic:'🔵',t:'Aperture',path:'Mode dial M or A  ·  front dial',steps:[
+      'Set the <b>mode dial</b> to <b>M</b> or <b>A</b> (aperture-priority).',
+      'Turn the <b>front dial</b> for native lenses.',
+      'On manual / adapted lenses, set aperture on the <b>lens ring</b> instead.']},
+    {ic:'🌡️',t:'White balance (Kelvin)',path:'Fn → White Balance',steps:[
+      'Press <b>Fn</b> and select the <b>White Balance</b> tile.',
+      'Scroll to <b>C.Temp./Filter</b> (the Kelvin option) and press <b>right</b>.',
+      'Turn the wheel to dial the exact Kelvin (e.g. <b>3200K</b> tungsten, <b>5600K</b> daylight).'],
+      note:'Lock a manual WB so a run of clips/photos matches — Auto WB drifts shot to shot.'},
+    {ic:'🎞️',t:'Picture Profile (S-Log)',path:'MENU → Camera 1 → Picture Profile',steps:[
+      'Go to <b>MENU → Camera 1 → Picture Profile</b>.',
+      '<b>PP7</b> is <b>S-Log2</b> out of the box.',
+      'For <b>S-Log3</b>: pick a slot → <b>Gamma → S-Log3</b>, then <b>Color Mode → S-Gamut3.Cine</b>.',
+      'Assign Picture Profile to a <b>custom button</b> (gear → Custom Key) for quick switching.']},
+    {ic:'🦓',t:'Zebras (to expose S-Log)',path:'MENU → gear (Custom) → Zebra',steps:[
+      'Go to <b>MENU → gear (Custom) → Zebra</b> and turn it <b>On</b>.',
+      'Set <b>Level 94</b> to guard highlights, or <b>100+</b> to spot true clipping.',
+      'Raise exposure until zebras just touch your brightest highlight, then ease back a hair.']},
+    {ic:'🎬',t:'Movie frame rate',path:'MENU → Camera 2 → File Format / Record Setting',steps:[
+      'Set <b>File Format = XAVC S 4K</b> (or HD) under <b>MENU → Camera 2</b>.',
+      'Open <b>Record Setting</b> and choose <b>24p / 25p / 30p / 60p</b> + bit rate.',
+      'Put the camera in <b>Movie</b> mode with exposure on <b>Manual</b> so you control ISO, shutter and aperture.'],
+      note:'The A7S II records 4K internally; for 120fps drop to 1080p.'}
+  ],
+  a7s:[
+    {ic:'🔆',t:'ISO',path:'Wheel ► (right)  ·  or Fn → ISO',steps:[
+      'Press the <b>right side of the control wheel</b> (ISO shortcut), or press <b>Fn</b> → <b>ISO</b>.',
+      'Turn the wheel / press <b>up-down</b> to choose, then press <b>center</b> to confirm.',
+      'Menu route: <b>MENU → Camera 1 → ISO</b>.'],
+      note:'In S-Log2 the A7S\'s native ISO is 3200 — its cleanest setting, not a high-ISO compromise.'},
+    {ic:'⏱️',t:'Shutter speed',path:'Mode dial M or S  ·  rear dial',steps:[
+      'Mode dial to <b>M</b> or <b>S</b>.',
+      'Turn the <b>rear dial</b> to set shutter speed (default).',
+      'For 24p footage use <b>1/48 or 1/50</b> (180° rule).'],
+      note:'Reassign dials in MENU → gear (Custom) → Dial Setup if the wrong one moves.'},
+    {ic:'🔵',t:'Aperture',path:'Mode dial M or A  ·  front dial',steps:[
+      'Mode dial to <b>M</b> or <b>A</b>.',
+      'Turn the <b>front dial</b> (native lens), or use the <b>lens aperture ring</b> on adapted glass.']},
+    {ic:'🌡️',t:'White balance (Kelvin)',path:'Fn → White Balance',steps:[
+      'Press <b>Fn</b> → <b>White Balance</b>.',
+      'Scroll to <b>C.Temp./Filter</b>, press <b>right</b>, then turn the wheel to set the Kelvin value.'],
+      note:'Set it manually and lock it so a sequence matches.'},
+    {ic:'🎞️',t:'Picture Profile (S-Log)',path:'MENU → Camera 1 → Picture Profile',steps:[
+      'Go to <b>MENU → Camera 1 → Picture Profile</b>.',
+      '<b>PP7</b> gives <b>S-Log2</b> (the A7S\'s native log).',
+      '<b>S-Log3</b> needs <b>firmware 2.00+</b> — then pick a slot → <b>Gamma → S-Log3</b>.'],
+      note:'On v1 firmware only S-Log2 is available. Update via Sony\'s firmware tool to unlock S-Log3.'},
+    {ic:'🦓',t:'Zebras (to expose S-Log)',path:'MENU → gear (Custom) → Zebra',steps:[
+      '<b>MENU → gear (Custom) → Zebra → On</b>.',
+      'Use <b>94</b> to protect highlights, <b>100+</b> to catch clipping.',
+      'Expose up until zebras kiss the brightest highlight, then back off slightly.']},
+    {ic:'🎬',t:'Movie frame rate',path:'MENU → Camera 2 → Record Setting',steps:[
+      'Set <b>File Format = XAVC S HD</b>, then pick the rate in <b>Record Setting</b> (24/25/30/60p).',
+      'Use <b>Movie</b> mode with <b>Manual</b> exposure for full control.'],
+      note:'The original A7S has NO internal 4K — record 4K via HDMI to an external recorder; internal capture is 1080p.'}
+  ],
+  g7x:[
+    {ic:'🔆',t:'ISO',path:'ISO button  ·  or Q menu → ISO',steps:[
+      'Press the <b>ISO button</b>, or open the <b>Q</b> (quick) menu and select <b>ISO</b>.',
+      'Turn the <b>control ring / dial</b> to pick a value, or leave on <b>Auto</b> with a max-ISO cap.'],
+      note:'Keep ISO ≤ ~3200 — the 1″ sensor gets noisy beyond that.'},
+    {ic:'⏱️',t:'Shutter speed',path:'Mode dial Tv or M',steps:[
+      'Turn the top <b>mode dial</b> to <b>Tv</b> or <b>M</b>.',
+      'Turn the <b>control ring</b> (around the lens) or rear dial to set shutter.',
+      'For 24 / 30p video keep it near <b>1/48–1/60</b>.']},
+    {ic:'🔵',t:'Aperture',path:'Mode dial Av or M',steps:[
+      'Turn the <b>mode dial</b> to <b>Av</b> or <b>M</b>.',
+      'Turn the <b>control ring</b> to set aperture (f/1.8 wide → f/2.8 at the long end).']},
+    {ic:'🌡️',t:'White balance',path:'Q menu → WB',steps:[
+      'Open the <b>Q</b> menu → <b>WB</b>.',
+      'Choose a preset or <b>Custom</b>; on the <b>G7 X III</b> you can set a <b>Color Temperature (Kelvin)</b> directly.'],
+      note:'Older G7 X (I / II) give presets + custom WB but limited or no Kelvin entry.'},
+    {ic:'🎞️',t:'Flat profile (no Log)',path:'Picture Style → Neutral',steps:[
+      'There\'s no C-Log on the G7 X — set <b>Picture Style → Neutral</b>.',
+      'Open <b>Detail set.</b> and pull <b>Contrast −4</b>, <b>Saturation −2</b>, <b>Sharpness</b> low for the most gradeable image.'],
+      note:'The 1″ sensor clips highlights hard — expose a touch under and protect the brights.'},
+    {ic:'🎬',t:'Movie frame rate',path:'Movie mode → record size',steps:[
+      'In <b>Movie</b> mode, open the menu → movie record size / frame rate.',
+      'Pick your rate — <b>G7 X III</b>: 4K30 / 1080p; <b>G7 X II</b>: 1080p up to 60.'],
+      note:'No built-in ND — in bright light you may have to stop down or raise the shutter.'}
+  ]
+};
+function renderHowto(camId){
+  const card=document.getElementById('howtoCard'), list=HOWTO[camId];
+  if(!list){ card.innerHTML=''; card.style.display='none'; return; }
+  let h='<div class="howto-h">How to set it on the '+PROFILES[camId].name+'</div>'
+       +'<div class="howto-c">Tap a control for the buttons / menu path. Exact menu page numbers shift a little by firmware — go by the tab &amp; section names.</div>';
+  list.forEach((it,i)=>{
+    h+='<div class="ht-item" id="ht'+i+'">'
+      +'<div class="ht-q" onclick="toggleHt('+i+')"><span class="ht-t"><span class="hti">'+it.ic+'</span>'+it.t+'</span><span class="ht-c">+</span></div>'
+      +'<div class="ht-a">'
+      +(it.path?'<span class="ht-path">'+it.path+'</span>':'')
+      +'<ul class="ht-steps">'+it.steps.map(s=>'<li>'+s+'</li>').join('')+'</ul>'
+      +(it.note?'<div class="ht-note">'+it.note+'</div>':'')
+      +'</div></div>';
+  });
+  card.innerHTML=h; card.style.display='block';
+}
+function toggleHt(i){ const el=document.getElementById('ht'+i); if(el) el.classList.toggle('open'); }
+
+/* ===== Beginner help: plain "Do this now" steps + a glossary ===== */
+// Short, plain action for each control on each body
+const CTRL={
+  a7s2:{
+    mode:'set the top mode dial to <b>M</b>',
+    modeV:'turn the mode dial to <b>Movie</b>, then MENU → Exposure Mode → <b>Manual</b>',
+    iso:'press the <b>right side of the control wheel</b>, then dial the number',
+    shutter:'turn the <b>rear dial</b>',
+    aperture:'turn the <b>front dial</b> (or the ring on a manual lens)',
+    wb:'press <b>Fn → White Balance → C.Temp./Filter</b>, then dial the Kelvin',
+    profile2:'MENU → Picture Profile → <b>PP7</b> (that\'s S-Log2)',
+    profile3:'MENU → Picture Profile → a slot → <b>Gamma → S-Log3</b>',
+    nd:'screw a <b>{ND}</b> filter onto the lens',
+    rec:'MENU → File Format → XAVC S, then Record Setting → <b>{fps}p</b>'
+  },
+  a7s:{
+    mode:'set the top mode dial to <b>M</b>',
+    modeV:'turn the mode dial to <b>Movie</b>, then MENU → Exposure Mode → <b>Manual</b>',
+    iso:'press the <b>right side of the control wheel</b>, then dial the number',
+    shutter:'turn the <b>rear dial</b>',
+    aperture:'turn the <b>front dial</b> (or the ring on a manual lens)',
+    wb:'press <b>Fn → White Balance → C.Temp./Filter</b>, then dial the Kelvin',
+    profile2:'MENU → Picture Profile → <b>PP7</b> (that\'s S-Log2)',
+    profile3:'MENU → Picture Profile → a slot → <b>Gamma → S-Log3</b> (needs firmware 2.0+)',
+    nd:'screw a <b>{ND}</b> filter onto the lens',
+    rec:'MENU → File Format → XAVC S HD, then Record Setting → <b>{fps}p</b>'
+  },
+  g7x:{
+    mode:'turn the mode dial to <b>M</b>',
+    modeV:'turn the mode dial to <b>Movie</b>',
+    iso:'press the <b>ISO</b> button (or Q menu → ISO), then dial the number',
+    shutter:'turn the <b>control ring</b> around the lens',
+    aperture:'turn the <b>control ring</b> around the lens',
+    wb:'open the <b>Q menu → WB</b> (→ Color Temp on the G7 X III)',
+    profileFlat:'Menu → Picture Style → <b>Neutral</b>, then Contrast −4',
+    nd:'(no ND slot — shoot in shade or stop down)',
+    rec:'Movie menu → record size → <b>{fps}p</b>'
+  }
+};
+function buildDoNow(p,r,camId){
+  const C=CTRL[camId]||{}, isV=(r.mode==='video'), steps=[];
+  steps.push(isV?['Go to Movie + Manual',C.modeV]:['Switch to Manual mode',C.mode]);
+  if(isV){
+    steps.push(['Set the frame rate to '+r.fps+'p',(C.rec||'').replace('{fps}',r.fps)]);
+    steps.push(['Lock the shutter at '+fmtShutter(r.shutter),C.shutter+' — then leave it. (This keeps motion looking natural, the "180° rule".)']);
+    if(r.nd) steps.push(['Cut the light with an '+r.nd.x,(C.nd||'add an ND filter').replace('{ND}',r.nd.x)]);
+    steps.push(['Open the aperture to '+fmtAp(r.aperture),C.aperture]);
+    steps.push(['Set ISO '+r.iso,C.iso]);
+  }else{
+    steps.push(['Open the aperture to '+fmtAp(r.aperture),C.aperture]);
+    steps.push(['Set ISO '+r.iso,C.iso]);
+    steps.push(['Set the shutter to '+fmtShutter(r.shutter),C.shutter+(r.secVal==='Tripod'?' — and put it on a tripod':'')]);
+  }
+  steps.push(['Set white balance to '+r.wb,C.wb]);
+  if(p.hasLog) steps.push(['Turn on the flat '+p.logName+' profile',(p.logName==='S-Log3'?C.profile3:C.profile2)]);
+  else if(C.profileFlat) steps.push(['Set a flat colour profile',C.profileFlat]);
+  steps.push([r.secVal==='Tripod'?'Steady it':'Brace for handheld',
+    r.secVal==='Tripod'?'use a tripod + 2-second timer so nothing shakes during the exposure'
+      :'tuck your elbows into your ribs, breathe out, and gently squeeze the shutter — don\'t jab it']);
+  return steps;
+}
+function doNowHTML(steps){
+  return '<ol class="do-now">'+steps.map(s=>'<li><div class="dn-t">'+s[0]+'</div><div class="dn-h">'+s[1]+'</div></li>').join('')+'</ol>';
+}
+
+const GLOSSARY=[
+  {t:'ISO',d:'How much the camera brightens the picture. Low (100–800) = clean; high (3200+) = brighter in the dark but grainier. "Base ISO" just means the camera\'s cleanest, lowest setting.'},
+  {t:'Aperture (f-number)',d:'How wide the lens opens. Small number like <b>f/1.8</b> = lots of light + blurry background; big number like <b>f/8</b> = less light + everything sharp.'},
+  {t:'Shutter speed',d:'How long the sensor "looks". Fast (1/500) freezes motion; slow (1/30) gathers more light but blurs movement and handshake.'},
+  {t:'White balance (Kelvin)',d:'Makes whites look white. Lower K (3200) = warmer/orange; higher K (5600+) = cooler/blue. Match it to your light.'},
+  {t:'Picture Profile / S-Log',d:'A flat, washed-out recording mode that keeps detail in shadows & highlights so you can colour it later. Looks dull out of camera — that\'s normal and correct.'},
+  {t:'Exposure',d:'Overall brightness. "Balanced" = not too dark or bright. "Expose to the right (ETTR)" = deliberately a bit brighter so shadows stay clean, then darken when editing.'},
+  {t:'Contrast',d:'The gap between darks and brights. High = punchy (deep blacks, bright whites); low/flat = soft and grey, which is easier to grade.'},
+  {t:'Saturation',d:'How colourful/intense the image is. High = vivid, punchy colours; low = muted, faded.'},
+  {t:'Creative Style',d:'Sony\'s built-in colour presets (Standard, Vivid, Neutral…). They set contrast, saturation and sharpness for you. Pick <b>Neutral</b> for the most editable image.'},
+  {t:'ND filter',d:'Sunglasses for your lens. In bright light it cuts the light so you can keep a slow, cinematic shutter without overexposing.'}
+];
+function renderGloss(camId){
+  const card=document.getElementById('glossCard');
+  if(!camId||!PROFILES[camId]){ card.style.display='none'; return; }
+  card.innerHTML='<div class="ht-item" id="glossItem"><div class="ht-q" onclick="toggleGloss()">'
+    +'<span class="ht-t"><span class="hti">🔰</span>New to this? What the words mean</span><span class="ht-c">+</span></div>'
+    +'<div class="ht-a">'+GLOSSARY.map(g=>'<div class="gl"><b>'+g.t+'</b> — '+g.d+'</div>').join('')+'</div></div>';
+  card.style.display='block';
+}
+function toggleGloss(){ const el=document.getElementById('glossItem'); if(el) el.classList.toggle('open'); }
 </script>
 </body>
 </html>
