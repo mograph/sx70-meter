@@ -555,21 +555,22 @@ body{
   <div class="scard" id="tmSection">
     <div class="scard-label">MiNT Time Machine Dial</div>
     <div class="scard-sub" id="tmSub">Tap any setting to test it.</div>
+    <div class="scard-sub" style="color:#3a3a3a;margin-top:-4px">These are the numbers printed on your dial — “60” is the 1/60 mark, “2” is the slow ½-second mark.</div>
     <div class="tm-pills" id="tmPills">
       <div class="pill interactive tm-auto" data-tm="A100" onclick="tapTM('A100')">A100</div>
       <div class="pill interactive tm-auto" data-tm="A600" onclick="tapTM('A600')">A600</div>
       <div class="pill interactive" data-tm="T"    onclick="tapTM('T')">T</div>
       <div class="pill interactive" data-tm="B"    onclick="tapTM('B')">B</div>
-      <div class="pill interactive" data-tm="2"    onclick="tapTM('2')">½s</div>
-      <div class="pill interactive" data-tm="4"    onclick="tapTM('4')">¼s</div>
-      <div class="pill interactive" data-tm="8"    onclick="tapTM('8')">1/8</div>
-      <div class="pill interactive" data-tm="15"   onclick="tapTM('15')">1/15</div>
-      <div class="pill interactive" data-tm="30"   onclick="tapTM('30')">1/30</div>
-      <div class="pill interactive" data-tm="60"   onclick="tapTM('60')">1/60</div>
-      <div class="pill interactive" data-tm="125"  onclick="tapTM('125')">1/125</div>
-      <div class="pill interactive" data-tm="250"  onclick="tapTM('250')">1/250</div>
-      <div class="pill interactive" data-tm="500"  onclick="tapTM('500')">1/500</div>
-      <div class="pill interactive" data-tm="1000" onclick="tapTM('1000')">1/1000</div>
+      <div class="pill interactive" data-tm="2"    onclick="tapTM('2')">2</div>
+      <div class="pill interactive" data-tm="4"    onclick="tapTM('4')">4</div>
+      <div class="pill interactive" data-tm="8"    onclick="tapTM('8')">8</div>
+      <div class="pill interactive" data-tm="15"   onclick="tapTM('15')">15</div>
+      <div class="pill interactive" data-tm="30"   onclick="tapTM('30')">30</div>
+      <div class="pill interactive" data-tm="60"   onclick="tapTM('60')">60</div>
+      <div class="pill interactive" data-tm="125"  onclick="tapTM('125')">125</div>
+      <div class="pill interactive" data-tm="250"  onclick="tapTM('250')">250</div>
+      <div class="pill interactive" data-tm="500"  onclick="tapTM('500')">500</div>
+      <div class="pill interactive" data-tm="1000" onclick="tapTM('1000')">1000</div>
     </div>
     <div class="tip" id="tmTip" style="margin-top:8px">--</div>
   </div>
@@ -605,6 +606,10 @@ body{
 
   <!-- 4. Flash details -->
   <div id="flashDetails" style="display:block">
+    <div class="scard" id="distCard">
+      <div class="scard-label">How far is your subject?</div>
+      <div class="chip-row" id="distChips" style="margin:0"></div>
+    </div>
     <div class="ftabs">
       <div class="ftab on" id="tabMint" onclick="setFType('mint')">Mint Flash<span class="fs">Variable power</span></div>
       <div class="ftab"    id="tabBar"  onclick="setFType('bar')">MiNT FlashBar<span class="fs">10 fixed bulbs</span></div>
@@ -635,9 +640,17 @@ body{
         <div class="pill" data-bp="off">Don't Use</div>
         <div class="pill" data-bp="on">Use Flash</div>
       </div>
-      <div class="dist-note" id="barDist" style="display:none">
-        <div class="dn-label">Stay Within</div>
+      <div class="dist-note" id="barFlashVerdict">
+        <div class="dn-label">FlashBar at your distance</div>
+        <div class="dn-value" id="barFlashVerdictVal" style="font-size:13px">--</div>
+      </div>
+      <div class="dist-note" id="barDist" style="display:none;margin-top:8px">
+        <div class="dn-label">Stand about</div>
         <div class="dn-value" id="barDistVal">--</div>
+      </div>
+      <div class="dist-note" id="barColor" style="margin-top:8px">
+        <div class="dn-label">Best film / colour</div>
+        <div class="dn-value" id="barColorVal" style="font-size:13px">--</div>
       </div>
       <div style="margin-top:10px">
         <div class="scard-label">Bulb Tracker — tap after each shot</div>
@@ -761,6 +774,7 @@ const histCvs=document.getElementById('histCanvas');
 const histCtx=histCvs.getContext('2d');
 let smoothEV=10,running=false,pvMode=false,pvEV=14;
 let usingFlash=true,ftype='mint',flashHudText='';
+let sceneBacklit=false,flashDist=1.5;
 let bulbs=new Array(10).fill(true);
 let videoTrack=null,useSensor=false,advOpen=false;
 let manualDial=null;
@@ -851,12 +865,29 @@ function showPanels(){
   document.getElementById('advToggle').style.display='block';
   document.getElementById('dialNote').style.display='block';
   document.getElementById('camVerdict').style.display='block';
+  buildDistChips();
 }
+
+// Subject distance picker (drives both flash recommendations)
+const DISTS=[0.5,1,1.5,2,3,4];
+function buildDistChips(){
+  const row=document.getElementById('distChips'); if(!row) return;
+  row.innerHTML='';
+  DISTS.forEach(d=>{
+    const c=document.createElement('div');
+    c.className='chip'+(d===flashDist?' on':'');
+    c.textContent=fmtDist(d);
+    c.onclick=()=>pickDist(d);
+    row.appendChild(c);
+  });
+}
+function pickDist(d){ flashDist=d; buildDistChips(); if(usingFlash) updateFlash(pvMode?pvEV:smoothEV); }
 
 function loop(){
   if(!running) return;
   ctx.drawImage(video,0,0,canvas.width,canvas.height);
-  const{avg,hist}=analyzeFrame();
+  const{avg,outerAvg,hist}=analyzeFrame();
+  sceneBacklit=(outerAvg-avg>42)&&avg<120;
   let ev,src;
   if(useSensor){const s=sensorEV();ev=(s!==null?s:pixelEV(avg));src=(s!==null?'real sensor data':'estimated from brightness');}
   else{ev=pixelEV(avg);src=isIphone?'estimated · iPhone Safari':'estimated from brightness';}
@@ -873,14 +904,15 @@ function analyzeFrame(){
   const x0=Math.floor(w*.25),x1=Math.floor(w*.75),y0=Math.floor(h*.25),y1=Math.floor(h*.75);
   const data=ctx.getImageData(0,0,w,h).data;
   const hist=new Array(256).fill(0);
-  let sum=0,count=0;
+  let sum=0,count=0,osum=0,ocount=0;
   for(let y=0;y<h;y++) for(let x=0;x<w;x++){
     const i=(y*w+x)*4;
     const lum=Math.round(.2126*data[i]+.7152*data[i+1]+.0722*data[i+2]);
     hist[lum]++;
-    if(x>=x0&&x<x1&&y>=y0&&y<y1){sum+=lum;count++;}
+    if(x>=x0&&x<x1&&y>=y0&&y<y1){sum+=lum;count++;} else {osum+=lum;ocount++;}
   }
-  return{avg:count?sum/count:0,hist};
+  const centerAvg=count?sum/count:0;
+  return{avg:centerAvg,outerAvg:ocount?osum/ocount:centerAvg,hist};
 }
 function pixelEV(b){if(b<1)b=1;return Math.max(2,Math.min(18,11+Math.log2(b/128)));}
 function sensorEV(){
@@ -925,43 +957,49 @@ function updateZone(ev){
 // Time Machine
 const TM_ORDER=['T','B','2','4','8','15','30','60','125','250','500','1000','A100','A600'];
 
+const TM_SECS={'2':'1/2s','4':'1/4s','8':'1/8s','15':'1/15s','30':'1/30s','60':'1/60s','125':'1/125s','250':'1/250s','500':'1/500s','1000':'1/1000s'};
+function tmLabel(v){ return TM_SECS[v]?(v+' ('+TM_SECS[v]+')'):({'T':'T (time)','B':'B (bulb)','A100':'A100 auto','A600':'A600 auto'}[v]||v); }
+
 function updateTM(ev){
   const eff=ev+FILMS[filmKey].eo;
   const is600=filmKey.startsWith('600');
   let rec,sub,tip;
 
   if(is600){
-    if(eff<5)      {rec='T';   tip='Very dark — use T (time exposure). Put camera on a stable surface. Press shutter once to open, again to close. Needs flash too.';}
-    else if(eff<7) {rec='2';   tip='Dark scene — try 1/2 sec shutter. Keep camera very steady or use a surface.';}
-    else if(eff<9) {rec='8';   tip='Dim scene — 1/8 sec. Hold camera steady against something solid.';}
-    else if(eff<11){rec='A600';tip='Good for 600 film — A600 is the right auto mode. Camera handles the rest.';}
-    else if(eff<14){rec='A600';tip='Good light — A600 auto mode is perfect here. The camera exposes correctly for your 600/i-Type film.';}
-    else           {rec='A600';tip='Bright scene — A600 auto mode. If shots are still too bright, push the lighten/darken dial toward Dark.';}
-    sub='600 film detected — A600 is your main auto mode.';
+    if(eff<5)      {rec='T';   tip='Very dark — set the dial to T (time). Rest the camera on something solid; press the shutter once to open, again to close. Add flash too.';}
+    else if(eff<7) {rec='2';   tip='Dark scene — set the dial to 2 (½ second). Keep the camera very steady or brace it.';}
+    else if(eff<9) {rec='8';   tip='Dim scene — set the dial to 8 (1/8s). Hold steady against something solid.';}
+    else           {rec='A600';tip='Good light — A600 is the right auto mode for 600 / i-Type film; the camera exposes it correctly. If shots come out too bright, push the lighten/darken dial toward Dark.';}
+    sub='600 film — A600 is your main auto mode.';
   } else if(usingFlash){
-    // SLR670-X with flash: camera handles metering, A100 not needed.
-    // Recommend a manual shutter to balance ambient vs flash.
-    if(eff<5)      {rec='2';   tip='Very dark — flash is primary. Use ½s to let some ambient fill in. Camera steady on a surface.';}
-    else if(eff<8) {rec='30';  tip='Dark scene — flash as main light. 1/30 balances flash with ambient. Hold steady.';}
-    else if(eff<11){rec='60';  tip='Dim to indoor — 1/60 is a clean flash sync speed. Flash fills shadows, ambient sets mood.';}
-    else if(eff<14){rec='125'; tip='Good light — 1/125 keeps ambient controlled so flash pops the subject.';}
-    else           {rec='500'; tip='Bright — fast shutter limits ambient. Flash only useful very close.';}
-    sub='Flash mode — A100 not needed, SLR670-X meters with flash.';
+    // FlashBar / MiNT flash: the dial number sets the BACKGROUND; the flash + distance sets the SUBJECT.
+    if(eff<6)       {rec='15'; tip='Dark room — set the dial to 15 (1/15s) so the background registers a little; the flash lights your subject. Brace the camera.';}
+    else if(eff<9)  {rec='30'; tip='Dim — set the dial to 30 (1/30s). The flash lights the subject, the slower speed keeps some background.';}
+    else if(eff<12) {rec='60'; tip='Normal indoor — set the dial to 60 (1/60s), the classic flash speed. The flash lights your subject; aim the centre ring at them. Your distance sets how bright THEY are — see the FlashBar panel below.';}
+    else            {rec='125';tip='Bright — set the dial to 125 (1/125s) so the bright background doesn\'t blow out; the flash fills your subject up close.';}
+    sub='Flash mode — the dial sets the background; the flash + your distance sets the subject.';
   } else {
-    if(eff<5)      {rec='T';   tip='Very dark — use T (time exposure). Camera on a surface. Press shutter once to open, again to close. Use flash if possible.';}
-    else if(eff<7) {rec='2';   tip='Dark scene — 1/2 sec shutter. Keep camera very still.';}
-    else if(eff<9) {rec='15';  tip='Dim indoor light — 1/15 sec is a good balance. Brace the camera.';}
-    else if(eff<11){rec='A100';tip='Indoor to overcast — A100 auto mode handles this range well for SX-70 film.';}
-    else if(eff<14){rec='A100';tip='Good light — A100 auto mode is ideal. The camera meters correctly for SX-70 film (ISO 160).';}
-    else           {rec='500'; tip='Bright sunny day — 1/500 sec to freeze motion and avoid overexposure. Or use A100 with dial pushed toward Dark.';}
-    sub='SX-70 film detected — A100 is your main auto mode.';
+    if(eff<5)      {rec='T';   tip='Very dark — set the dial to T (time). Rest the camera on a surface; press once to open, again to close. Use flash if you can.';}
+    else if(eff<7) {rec='2';   tip='Dark scene — set the dial to 2 (½ second). Keep very still.';}
+    else if(eff<9) {rec='15';  tip='Dim indoor — set the dial to 15 (1/15s). Brace the camera.';}
+    else if(eff<14){rec='A100';tip='Good light — A100 auto mode is ideal; the camera meters SX-70 film (ISO 160) correctly. Aim the centre ring at your main subject.';}
+    else           {rec='500'; tip='Bright sun — set the dial to 500 (1/500s) to avoid overexposure, or use A100 with the lighten/darken dial toward Dark.';}
+    sub='SX-70 film — A100 is your main auto mode.';
+  }
+
+  // Backlight override — the silhouette trap (bright background, darker subject)
+  if(sceneBacklit){
+    if(usingFlash){
+      sub='⚠ Backlit — the flash will save your subject.';
+      tip='Bright background, darker subject — this is what silhouetted your last shot. Aim the centre ring at your SUBJECT and let the flash light them; dial '+rec+' is fine. The background stays bright — that\'s the trade-off.';
+    } else {
+      sub='⚠ Backlit — turn the FlashBar on.';
+      tip='Bright background, darker subject — without flash they\'ll come out as a silhouette. Best fix: switch the flash on. Otherwise aim the centre ring at your SUBJECT (the dial slows down to expose them) and accept a blown-white background, or move your subject out of the backlight.';
+    }
   }
 
   if(manualTM!==null&&manualTM!==rec){
-    const lbl={'T':'Time (T)','B':'Bulb (B)','A100':'A100 Auto','A600':'A600 Auto',
-      '2':'½s','4':'¼s','8':'1/8s','15':'1/15s','30':'1/30s','60':'1/60s',
-      '125':'1/125s','250':'1/250s','500':'1/500s','1000':'1/1000s'}[manualTM]||manualTM;
-    tip=`Testing ${lbl} — tap again to clear. Recommended: ${rec}.`;
+    tip=`Testing dial ${tmLabel(manualTM)} — tap again to clear. Recommended: ${tmLabel(rec)}.`;
   }
 
   document.getElementById('tmSub').textContent=sub;
@@ -1155,44 +1193,56 @@ function updateFlash(ev){
   if(ftype==='mint') updateMintFlash(ev);
   else updateFlashBar(ev);
 }
+function fmtDist(d){ return (d%1===0?d:d.toFixed(1))+' m'; }
+const MINT_LABELS=['OFF','1/16','1/8','1/4','1/2','FULL'];
 function updateMintFlash(ev){
-  const eff=ev+FILMS[filmKey].eo;
-  let rec,dist,tip;
-  if(eff<5)      {rec=5;dist='0.5–1.5 m';tip='Very dark — flash is your only light. Stay close (arm\'s reach). Pair with dial at Max Light.';}
-  else if(eff<8) {rec=4;dist='0.6–2 m';  tip='Low light — flash is main source. 1/2 power, stay within 2 m. Dial toward Lighter.';}
-  else if(eff<10){rec=3;dist='0.6–2.5 m';tip='Dim — 1/4 power fills harsh shadows. Dial near Centre.';}
-  else if(eff<=12){rec=2;dist='1–3 m';   tip='Good light — gentle 1/8 fill for shadows. Easy to over-flash, stay 1–3 m.';}
-  else if(eff<=14){rec=1;dist='—';       tip='Bright — 1/16 only for deep shadows. Better to skip flash and use dial toward Dark.';}
-  else            {rec=0;dist='—';       tip='Too bright — flash will blow your Polaroid out. Skip flash, push dial to Max Dark.';}
-  document.getElementById('mintDistVal').textContent=dist;
-  document.getElementById('mintTip').textContent=tip;
+  const is600=filmKey.startsWith('600');
+  // sweet-spot distance (m) for each power on SX-70 film; ×2 for faster 600 film
+  const baseSX=[0,0.75,1.06,1.5,2.1,3.0];
+  const corr=baseSX.map(d=> is600? d*2 : d);
+  let rec=1,best=1e9;
+  for(let p=1;p<=5;p++){ const e=Math.abs(corr[p]-flashDist); if(e<best){best=e;rec=p;} }
+  document.getElementById('mintDistVal').textContent='Use '+MINT_LABELS[rec]+' power  ·  sweet spot ~'+fmtDist(corr[rec]);
+  document.getElementById('mintTip').textContent=
+    'Power = how much light the flash gives off. FULL reaches the farthest / brightest; 1/16 is the gentlest (close-ups or a little fill). '
+    +'At '+fmtDist(flashDist)+' on '+(is600?'600':'SX-70')+' film, set '+MINT_LABELS[rec]+'. Step closer → drop a power level; step back → raise one.';
   document.querySelectorAll('#mintPills .pill').forEach(p=>{
     const d=parseInt(p.dataset.p); p.className='pill';
     if(d===rec)              p.classList.add('rec');
     else if(Math.abs(d-rec)===1) p.classList.add('near');
   });
-  const labels=['OFF','1/16','1/8','1/4','1/2','FULL'];
-  flashHudText=rec>0?`⚡ ${labels[rec]}${dist!=='—'?' · '+dist:''}` :'⚡ Skip flash';
+  flashHudText='⚡ '+MINT_LABELS[rec]+' · '+fmtDist(flashDist);
 }
 function updateFlashBar(ev){
-  const eff=ev+FILMS[filmKey].eo;
+  const is600=filmKey.startsWith('600');
+  const isColor=filmKey.endsWith('-c');
   const rem=bulbs.filter(Boolean).length;
-  let use,dist,tip;
-  if(rem===0){use=false;dist='—';tip='All 10 bulbs used — replace the FlashBar cartridge.';}
-  else if(eff<6) {use=true; dist='0.5–1.2 m';tip='Very dark — FlashBar essential. Fixed power, stay close (0.5–1.2 m).';}
-  else if(eff<9) {use=true; dist='0.6–1.8 m';tip='Low light — FlashBar is main light. Stay within 1.8 m.';}
-  else if(eff<11){use=true; dist='0.8–2 m'; tip='Dim — FlashBar fill at 0.8–2 m. Great for indoor portraits.';}
-  else if(eff<=13){use=false;dist='1–2.5 m';tip='Good light — FlashBar optional. Save bulbs unless subject has deep shadows.';}
-  else            {use=false;dist='—';       tip='Too bright — FlashBar will overexpose. Skip it, push dial toward Dark.';}
+  const corr=is600?2.8:1.4;                       // ideal distance for a fixed-power bulb
+  const stops=2*Math.log2(corr/Math.max(0.3,flashDist));
+  let verdict,use=rem>0;
+  if(rem===0){ verdict='All 10 bulbs used — swap the FlashBar cartridge.'; }
+  else if(Math.abs(stops)<0.6){ verdict='✓ Good exposure at '+fmtDist(flashDist)+'.'; }
+  else if(stops>0){ verdict='Too BRIGHT by ~'+stops.toFixed(1)+' stops — step back to about '+fmtDist(corr)+'.'; }
+  else           { verdict='Too DARK by ~'+(-stops).toFixed(1)+' stops — move in to about '+fmtDist(corr)+'. (Standing too far is what made your shot a silhouette.)'; }
+  document.getElementById('barFlashVerdictVal').textContent=verdict;
+  document.getElementById('barDist').style.display='block';
+  document.getElementById('barDistVal').textContent='~'+fmtDist(corr)+' on '+(is600?'600':'SX-70')+' film';
+  // Film / colour recommendation
+  document.getElementById('barColorVal').textContent=
+    (isColor?'Colour film — perfect':'B&W — fine')
+    +(is600?'  ·  600 reaches ~2× farther':'  ·  switch to 600 for more range');
+  document.getElementById('barTip').textContent=
+    'FlashBar bulbs are FIXED power — there is no half/full to set; your ONLY control is distance. '
+    +'The bulbs are daylight-balanced (~5500K), so they render COLOUR film accurately — great for natural skin tones. '
+    +'Faster 600 film lets the bulb reach ~2× farther (stand ~2.8 m); SX-70 film needs you closer (~1.4 m).';
+  const eff=ev+FILMS[filmKey].eo;
+  use = use && eff<13;                             // skip only in bright daylight
   document.querySelectorAll('#barPills .pill').forEach(p=>{
     p.className='pill';
     if(p.dataset.bp==='on'&&use)   p.classList.add('rec');
     if(p.dataset.bp==='off'&&!use) p.classList.add('rec');
-    if(p.dataset.bp==='on'&&!use&&rem>0) p.classList.add('near');
   });
-  document.getElementById('barDist').style.display=use?'block':'none';
-  document.getElementById('barDistVal').textContent=dist;
-  document.getElementById('barTip').textContent=tip;
+  flashHudText='⚡ FlashBar · stand ~'+fmtDist(corr);
 }
 
 // Bulbs
