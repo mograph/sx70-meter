@@ -606,23 +606,22 @@ body{
 
   <!-- 4. Flash details -->
   <div id="flashDetails" style="display:block">
-    <div class="scard" id="distCard">
+    <div class="scard" id="distCard" style="display:none">
       <div class="scard-label">How far is your subject?</div>
       <div class="chip-row" id="distChips" style="margin:0"></div>
     </div>
     <div class="ftabs">
-      <div class="ftab on" id="tabMint" onclick="setFType('mint')">Mint Flash<span class="fs">you set the power</span></div>
-      <div class="ftab"    id="tabBar"  onclick="setFType('bar')">FlashBar<span class="fs">fixed-power bulbs</span></div>
+      <div class="ftab on" id="tabBar"  onclick="setFType('bar')">Flash Bar 2<span class="fs">Off · Half · Full</span></div>
+      <div class="ftab"    id="tabMint" onclick="setFType('mint')">Adjustable flash<span class="fs">1/16 → FULL</span></div>
     </div>
     <div class="scard-sub" id="flashWhich" style="margin:0 2px 9px;color:#888;line-height:1.55">
-      <b style="color:#aaa">Mint Flash</b> = a reusable flash you pick a power on (1/16 → FULL).&nbsp;
-      <b style="color:#aaa">FlashBar</b> = a strip of one-time bulbs at one fixed power — distance is your only control.<br>
-      <i style="color:#555">Not sure which you have? If it has a <b>power setting</b> → Mint Flash. If it's a bar of little bulbs you swap when used up → FlashBar.</i>
+      <b style="color:#aaa">Flash Bar 2</b> = the MiNT flash that clips into the flash slot. Reusable (2× AAA), one switch — <b>Off / Half / Full</b>. Match it to your <b>film</b>: <b>Full for SX-70, Half for 600</b>.<br>
+      <i style="color:#555"><b style="color:#888">Adjustable flash</b> = a different flash where you dial a fine power (1/16 → FULL). Most people on an SX-70 have the Flash Bar 2.</i>
     </div>
 
-    <!-- Mint Flash -->
-    <div class="scard" id="mintCard">
-      <div class="scard-label">Mint Flash Power</div>
+    <!-- Adjustable flash -->
+    <div class="scard" id="mintCard" style="display:none">
+      <div class="scard-label">Adjustable flash — power</div>
       <div class="pills" id="mintPills">
         <div class="pill" data-p="0">OFF</div>
         <div class="pill" data-p="1">1/16</div>
@@ -638,29 +637,25 @@ body{
       <div class="tip" id="mintTip">--</div>
     </div>
 
-    <!-- FlashBar -->
-    <div class="scard" id="barCard" style="display:none">
-      <div class="scard-label">MiNT FlashBar</div>
+    <!-- MiNT Flash Bar 2 -->
+    <div class="scard" id="barCard">
+      <div class="scard-label">MiNT Flash Bar 2 — Off / Half / Full switch</div>
       <div class="pills" id="barPills" style="margin-bottom:8px">
-        <div class="pill" data-bp="off">Don't Use</div>
-        <div class="pill" data-bp="on">Use Flash</div>
+        <div class="pill" data-bp="off">Off</div>
+        <div class="pill" data-bp="half">Half</div>
+        <div class="pill" data-bp="full">Full</div>
       </div>
       <div class="dist-note" id="barFlashVerdict">
-        <div class="dn-label">FlashBar at your distance</div>
-        <div class="dn-value" id="barFlashVerdictVal" style="font-size:13px">--</div>
-      </div>
-      <div class="dist-note" id="barDist" style="display:none;margin-top:8px">
-        <div class="dn-label">Stand about</div>
-        <div class="dn-value" id="barDistVal">--</div>
+        <div class="dn-label">Set the switch to</div>
+        <div class="dn-value" id="barFlashVerdictVal" style="font-size:16px">--</div>
       </div>
       <div class="dist-note" id="barColor" style="margin-top:8px">
-        <div class="dn-label">Best film / colour</div>
-        <div class="dn-value" id="barColorVal" style="font-size:13px">--</div>
+        <div class="dn-label">Why</div>
+        <div class="dn-value" id="barColorVal" style="font-size:12px;font-weight:600;color:#9a9a9a;line-height:1.5">--</div>
       </div>
-      <div style="margin-top:10px">
-        <div class="scard-label">Bulb Tracker — tap after each shot</div>
-        <div class="bcount" id="bcount">10 bulbs remaining</div>
-        <div class="bulb-grid" id="bgrid"></div>
+      <div class="dist-note" id="barDist" style="margin-top:8px">
+        <div class="dn-label">Keep subject within</div>
+        <div class="dn-value" id="barDistVal">--</div>
       </div>
       <div class="tip" id="barTip">--</div>
     </div>
@@ -778,7 +773,7 @@ const ctx=canvas.getContext('2d');
 const histCvs=document.getElementById('histCanvas');
 const histCtx=histCvs.getContext('2d');
 let smoothEV=10,running=false,pvMode=false,pvEV=14;
-let usingFlash=true,ftype='mint',flashHudText='';
+let usingFlash=true,ftype='bar',flashHudText='';
 let sceneBacklit=false,flashDist=1.5;
 let bulbs=new Array(10).fill(true);
 let videoTrack=null,useSensor=false,advOpen=false;
@@ -1188,6 +1183,7 @@ function setFType(t){
   document.getElementById('tabBar').classList.toggle('on',t==='bar');
   document.getElementById('mintCard').style.display=t==='mint'?'block':'none';
   document.getElementById('barCard').style.display=t==='bar'?'block':'none';
+  document.getElementById('distCard').style.display=t==='mint'?'block':'none';
   updateFlash(pvMode?pvEV:smoothEV);
 }
 function updateFlash(ev){
@@ -1215,39 +1211,29 @@ function updateMintFlash(ev){
 }
 function updateFlashBar(ev){
   const is600=filmKey.startsWith('600');
-  const isColor=filmKey.endsWith('-c');
-  const rem=bulbs.filter(Boolean).length;
-  const corr=is600?2.8:1.4;                       // ideal distance for a fixed-power bulb
-  const stops=2*Math.log2(corr/Math.max(0.3,flashDist));
-  let verdict,use=rem>0;
-  if(rem===0){ verdict='All 10 bulbs used — swap the FlashBar cartridge.'; }
-  else if(Math.abs(stops)<0.6){ verdict='✓ Good exposure at '+fmtDist(flashDist)+'.'; }
-  else if(stops>0){ verdict='Too BRIGHT by ~'+stops.toFixed(1)+' stops — step back to about '+fmtDist(corr)+'.'; }
-  else           { verdict='Too DARK by ~'+(-stops).toFixed(1)+' stops — move in to about '+fmtDist(corr)+'. (Standing too far is what made your shot a silhouette.)'; }
-  document.getElementById('barFlashVerdictVal').textContent=verdict;
-  document.getElementById('barDist').style.display='block';
-  document.getElementById('barDistVal').textContent='~'+fmtDist(corr)+' on '+(is600?'600':'SX-70')+' film';
-  // Film / colour recommendation
-  document.getElementById('barColorVal').textContent=
-    (isColor?'Colour film — perfect':'B&W — fine')
-    +(is600?'  ·  600 reaches ~2× farther':'  ·  switch to 600 for more range');
+  // The Flash Bar 2's switch is matched to FILM speed, not the room:
+  //   Full = SX-70 film (ISO 160, slower) · Half = 600 film (ISO 640, faster)
+  const recPower = is600 ? 'half' : 'full';
+  const recLabel = is600 ? 'HALF power' : 'FULL power';
+  document.getElementById('barFlashVerdictVal').textContent=recLabel+'  (you loaded '+(is600?'600':'SX-70')+' film)';
+  document.getElementById('barColorVal').textContent= is600
+    ? '600 film is fast (ISO 640) — Half power stops it overexposing. Daylight-balanced, so Colour film looks natural.'
+    : 'SX-70 film is slow (ISO 160) — it needs the Full pop. Daylight-balanced, so Colour film looks natural.';
+  const corr=is600?2.8:1.4;
+  document.getElementById('barDistVal').textContent='~'+fmtDist(corr)+'  ·  closer = too bright, farther = too dark';
   document.getElementById('barTip').textContent=
-    'FlashBar bulbs are FIXED power — there is no half/full to set; your ONLY control is distance. '
-    +'The bulbs are daylight-balanced (~5500K), so they render COLOUR film accurately — great for natural skin tones. '
-    +'Faster 600 film lets the bulb reach ~2× farther (stand ~2.8 m); SX-70 film needs you closer (~1.4 m).';
-  const eff=ev+FILMS[filmKey].eo;
-  use = use && eff<13;                             // skip only in bright daylight
+    'Reusable flash (2× AAA, ~5–10s recharge between shots). Its only setting is this switch — set it by your FILM: '
+    +recLabel+' for '+(is600?'600':'SX-70')+'. Keep your subject around '+fmtDist(corr)+'; if a close-up still comes out too bright, nudge the lighten/darken dial toward Dark.';
   document.querySelectorAll('#barPills .pill').forEach(p=>{
     p.className='pill';
-    if(p.dataset.bp==='on'&&use)   p.classList.add('rec');
-    if(p.dataset.bp==='off'&&!use) p.classList.add('rec');
+    if(p.dataset.bp===recPower) p.classList.add('rec');
   });
-  flashHudText='⚡ FlashBar · stand ~'+fmtDist(corr);
+  flashHudText='⚡ Flash Bar 2 · '+recLabel;
 }
 
 // Bulbs
 function buildBulbs(){
-  const g=document.getElementById('bgrid'); g.innerHTML='';
+  const g=document.getElementById('bgrid'); if(!g) return; g.innerHTML='';
   for(let i=0;i<10;i++){
     const b=document.createElement('div');
     b.className='bulb y'; b.textContent=i+1; b.onclick=()=>tapBulb(i);
