@@ -611,8 +611,13 @@ body{
       <div class="chip-row" id="distChips" style="margin:0"></div>
     </div>
     <div class="ftabs">
-      <div class="ftab on" id="tabMint" onclick="setFType('mint')">Mint Flash<span class="fs">Variable power</span></div>
-      <div class="ftab"    id="tabBar"  onclick="setFType('bar')">MiNT FlashBar<span class="fs">10 fixed bulbs</span></div>
+      <div class="ftab on" id="tabMint" onclick="setFType('mint')">Mint Flash<span class="fs">you set the power</span></div>
+      <div class="ftab"    id="tabBar"  onclick="setFType('bar')">FlashBar<span class="fs">fixed-power bulbs</span></div>
+    </div>
+    <div class="scard-sub" id="flashWhich" style="margin:0 2px 9px;color:#888;line-height:1.55">
+      <b style="color:#aaa">Mint Flash</b> = a reusable flash you pick a power on (1/16 → FULL).&nbsp;
+      <b style="color:#aaa">FlashBar</b> = a strip of one-time bulbs at one fixed power — distance is your only control.<br>
+      <i style="color:#555">Not sure which you have? If it has a <b>power setting</b> → Mint Flash. If it's a bar of little bulbs you swap when used up → FlashBar.</i>
     </div>
 
     <!-- Mint Flash -->
@@ -1008,15 +1013,11 @@ function updateTM(ev){
   document.querySelectorAll('#tmPills .pill').forEach(p=>{
     const isBig=p.classList.contains('tm-auto');
     p.className='pill interactive'+(isBig?' tm-auto':'');
+    // One highlight only: the pick you're testing, otherwise the single recommendation.
     if(manualTM!==null){
       if(p.dataset.tm===manualTM) p.classList.add('manual-sel');
-      else if(p.dataset.tm===rec)  p.classList.add('near');
-    } else {
-      if(p.dataset.tm===rec) p.classList.add('rec');
-      else{
-        const ri=TM_ORDER.indexOf(rec),pi=TM_ORDER.indexOf(p.dataset.tm);
-        if(ri>=0&&pi>=0&&Math.abs(pi-ri)===1) p.classList.add('near');
-      }
+    } else if(p.dataset.tm===rec){
+      p.classList.add('rec');
     }
   });
 }
@@ -1208,8 +1209,7 @@ function updateMintFlash(ev){
     +'At '+fmtDist(flashDist)+' on '+(is600?'600':'SX-70')+' film, set '+MINT_LABELS[rec]+'. Step closer → drop a power level; step back → raise one.';
   document.querySelectorAll('#mintPills .pill').forEach(p=>{
     const d=parseInt(p.dataset.p); p.className='pill';
-    if(d===rec)              p.classList.add('rec');
-    else if(Math.abs(d-rec)===1) p.classList.add('near');
+    if(d===rec) p.classList.add('rec');   // single recommendation, no neighbours
   });
   flashHudText='⚡ '+MINT_LABELS[rec]+' · '+fmtDist(flashDist);
 }
