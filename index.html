@@ -78,6 +78,7 @@ body{
 .cam-sim{position:absolute;inset:0;z-index:0;transition:background .4s,opacity .4s;display:none;}
 
 /* Grain texture over sim */
+.cam-flash{position:absolute;inset:0;z-index:2;pointer-events:none;display:none;transition:background .3s;}
 .cam-sim-grain{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.07;display:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
@@ -484,6 +485,7 @@ body{
       <small id="httpsNote" style="display:none">⚠ Camera requires HTTPS.<br>Use the <b>https://</b> URL from your Mac terminal.</small>
     </div>
     <video id="video" autoplay playsinline muted></video>
+    <div class="cam-flash" id="camFlash"></div>
     <div class="pscreen" id="pscreen">
       <div class="pi" id="pi">☀️</div>
       <div class="pl" id="pl">BRIGHT DAY</div>
@@ -1090,26 +1092,33 @@ function updateResult(ev){
   const tmOff=tmSpeedOffset(ev);
   const finalEV=ev+filmOff+dialOff+tmOff;
 
+  // Flash lifts a dark SUBJECT toward a correct exposure (more in darker scenes).
+  // The Flash Bar 2 / Mint flash on the SLR670-X can pull a dim room up to ~correct on the subject;
+  // the background stays at the ambient level (the flash doesn't reach it).
+  const flashLift = usingFlash ? Math.max(0, Math.min(6, 11 - finalEV)) : 0;
+  const effEV = finalEV + flashLift;     // what the lit subject will actually look like
+  const lit = flashLift>0.5;
+
   let verdict,desc,bg,cls;
-  if(finalEV>15){
+  if(effEV>15){
     verdict='Blown Out'; cls='very-bright';
-    desc='Will be completely white and washed out. Push dial toward Dark.';
+    desc='Will be completely white and washed out. Push the dial toward Dark.';
     bg='#ffffff';
-  } else if(finalEV>13){
+  } else if(effEV>13){
     verdict='Too Bright'; cls='bright';
-    desc='Highlights will bleach. Slightly overexposed for Polaroid film.';
+    desc='Highlights will bleach. Slightly overexposed for Polaroid film.'+(lit?' Move your subject a little farther from the flash.':'');
     bg='linear-gradient(135deg,#fffaf0,#f5e6c8)';
-  } else if(finalEV>=10){
-    verdict='Looks Good!'; cls='good';
-    desc='Well exposed. Colours and shadows should come out naturally.';
+  } else if(effEV>=10){
+    verdict=lit?'Looks Good! · flash':'Looks Good!'; cls='good';
+    desc=lit?'The flash lifts your subject to a clean exposure. The background stays darker — the flash doesn\'t reach it.':'Well exposed. Colours and shadows should come out naturally.';
     bg='rgba(80,120,70,0.6)';
-  } else if(finalEV>=7){
+  } else if(effEV>=7){
     verdict='Slightly Dark'; cls='dark';
-    desc='A bit underexposed. Shadows will be dense. Try lightening the dial one step.';
+    desc='A bit underexposed.'+(usingFlash?' Move your subject a little closer to the flash.':' Lighten the dial a step, or turn the flash on.');
     bg='linear-gradient(135deg,#1a1a2e,#0a0a18)';
   } else {
     verdict='Too Dark'; cls='very-dark';
-    desc='Will come out nearly black. Need Max Lighten + flash.';
+    desc=usingFlash?'Even with flash this is dark — move much closer to your subject.':'Will come out nearly black. Need Max Lighten + flash.';
     bg='#000000';
   }
 
@@ -1119,6 +1128,16 @@ function updateResult(ev){
   const sim=document.getElementById('camSim');
   sim.style.background=bg;
 
+  // Flash-look overlay: a pool of light on the centre subject, falling off to darker edges
+  const cf=document.getElementById('camFlash');
+  if(cf){
+    if((running||pvMode)&&flashLift>0.3){
+      const dom=Math.min(1,flashLift/6);
+      cf.style.display='block';
+      cf.style.background='radial-gradient(ellipse 64% 58% at 50% 44%, rgba(255,252,242,'+(0.08+0.22*dom).toFixed(2)+') 0%, rgba(255,252,242,0) 46%, rgba(0,0,0,'+(0.10+0.5*dom).toFixed(2)+') 100%)';
+    } else { cf.style.display='none'; }
+  }
+
   if(pvMode){
     sim.style.opacity='1';
     sim.style.zIndex='0';
@@ -1126,12 +1145,10 @@ function updateResult(ev){
     video.style.filter='';
   } else if(running){
     sim.style.display='none';
-    // Brightness filter derived from stops off ideal (EV 11 = centre of "good" zone).
-    // Each stop = ×2 or ÷2 brightness, matching how film actually responds.
-    const targetEV=11;
-    const stopsOff=finalEV-targetEV;
-    // Amplify by 1.8× so each stop feels much more obvious on screen
-    const bf=Math.max(0.01,Math.min(12,Math.pow(2,stopsOff*1.8)));
+    // Ambient brightness from stops off ideal (EV 11), amplified for visibility...
+    let bf=Math.max(0.01,Math.min(12,Math.pow(2,(finalEV-11)*1.8)));
+    // ...then lifted by the flash so the subject reads as exposed.
+    if(usingFlash) bf=Math.min(4,Math.max(bf,Math.pow(2,(effEV-11)*0.9)));
     video.style.filter=`brightness(${bf.toFixed(3)})`;
   }
 
@@ -1150,16 +1167,17 @@ function updateResult(ev){
   const filmPart=filmOff?` + film (${filmOff>0?'+':''}${filmOff})`:'';
   const dialPart=` + dial (${dialOff>0?'+':''}${dialOff.toFixed(2)})`;
   const tmPart=tmOff?` + TM (${tmOff>0?'+':''}${tmOff.toFixed(1)})`:'';
+  const flashPart=flashLift>0.05?` + flash (+${flashLift.toFixed(1)})`:'';
   document.getElementById('resultEVAdj').textContent=
-    `Scene ${ev.toFixed(1)}${filmPart}${dialPart}${tmPart} = ${finalEV.toFixed(1)} EV`;
+    `Scene ${ev.toFixed(1)}${filmPart}${dialPart}${tmPart}${flashPart} = ${effEV.toFixed(1)} EV`;
 
   // Camera HUD panel
   const hud=document.getElementById('camHud');
   if(running||pvMode){
     hud.style.display='flex';
     document.getElementById('hudZone').textContent=verdict;
-    const stopsLabel=(finalEV-11)>=0?`+${(finalEV-11).toFixed(1)}`:(finalEV-11).toFixed(1);
-    document.getElementById('hudEV').textContent=`${finalEV.toFixed(1)} EV (${stopsLabel} stops)`;
+    const stopsLabel=(effEV-11)>=0?`+${(effEV-11).toFixed(1)}`:(effEV-11).toFixed(1);
+    document.getElementById('hudEV').textContent=`${effEV.toFixed(1)} EV (${stopsLabel} stops)`;
     document.getElementById('hudFlash').textContent=usingFlash?flashHudText:'';
   } else {
     hud.style.display='none';
@@ -1175,7 +1193,7 @@ function toggleFlash(){
   document.getElementById('ftog').classList.toggle('on',usingFlash);
   document.getElementById('flashDetails').style.display=usingFlash?'block':'none';
   document.getElementById('ftogsub').textContent=usingFlash?'Flash guide on':'Tap to turn on flash guide';
-  if(usingFlash) updateFlash(pvMode?pvEV:smoothEV);
+  if(running||pvMode) fullUpdate();   // refresh the preview so the flash look appears/disappears
 }
 function setFType(t){
   ftype=t;
